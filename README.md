@@ -20,10 +20,10 @@
 ## 4. Lộ trình phát triển (Development Milestones)
 
 ### Milestone 1: Foundation & The Gatekeeper
-- [ ] Khởi tạo dự án (Vite).
-- [ ] Thiết kế Design System (Colors, Typography, Effects).
-- [ ] Xây dựng Landing Page (Hero, Features).
-- [ ] Tích hợp Mock Authentication & Blur Effect.
+- [x] Khởi tạo dự án (Vite).
+- [x] Thiết kế Design System (Colors, Typography, Effects).
+- [x] Xây dựng Landing Page (Hero, Features).
+- [x] Tích hợp Mock Authentication & Blur Effect.
 
 ### Milestone 2: Expansion
 - [ ] Nâng cấp bộ máy quét dữ liệu (Global setup).
