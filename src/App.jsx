@@ -451,7 +451,7 @@ function Dashboard({ t }) {
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button className="glass-panel" style={{ padding: '0.5rem 1rem', cursor: 'pointer', color: 'var(--primary)', borderColor: 'var(--primary)' }}>{t.dashboard.tabs.overview}</button>
-          <button className="glass-panel" style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>{t.dashboard.tabs.signals}</button>
+          <button className="glass-panel" style={{ padding: '0.5rem 1rem', cursor: 'pointer', color: 'var(--text-muted)' }}>{t.dashboard.tabs.signals}</button>
         </div>
       </div>
 
