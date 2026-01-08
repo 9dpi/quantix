@@ -5,8 +5,7 @@
 | Challenge | Impact | Proposed Solution |
 |-----------|--------|-------------------|
 | **Multi-Timezone** | Dự báo sai lệch thời gian (ví dụ: ngày T+1 của VN khác Mỹ). | **UTC Core Strategy**: Lưu trữ mọi timestamp dưới dạng UTC. Frontend tự quy đổi múi giờ dựa trên `Asset_Config` (VN30: Global+7, NYSE: Global-4). |
-| **Data Reliability** | Yahoo Finance bị rate limit, dữ liệu trễ 15p, hoặc trả về null. | **Multi-Source Failover**: Cơ chế "Thác nước" (Waterfall). |
-| **Data Quality** | Giá trị rác (NaN, Infinity) làm sập model AI. | **Validation Layer**: Lớp kiểm duyệt dữ liệu nghiêm ngặt trước khi nhập kho. |
+| **Anti-Scraping Strictness** | Các trang tài chính chặn IP/API request. | **AI Vision Scraper (The "Secret Weapon")**: Sử dụng Headless Browser chụp ảnh màn hình bảng giá -> Dùng AI OCR (Tesseract/Vision Model) để "đọc" số liệu. Bỏ qua hoàn toàn việc can thiệp vào Network/DOM. |
 
 ## 2. The "Waterfall" Failover Mechanism
 Hệ thống sẽ không bao giờ phụ thuộc vào 1 nguồn duy nhất.
@@ -15,9 +14,9 @@ Hệ thống sẽ không bao giờ phụ thuộc vào 1 nguồn duy nhất.
 graph TD
     A[Request Data] --> B{Source 1: Yahoo (Free)};
     B -- Success --> E[Validation Layer];
-    B -- Fail/RateLimit --> C{Source 2: Alpha Vantage/Google (Backup)};
+    B -- Fail/RateLimit --> C{Source 2: AI Vision Scraper (Anti-Block)};
     C -- Success --> E;
-    C -- Fail --> D{Source 3: Paid API (Polygon/Binance)};
+    C -- Fail/Slow --> D{Source 3: Paid API (Polygon/Binance)};
     D -- Success --> E;
     D -- Fail --> F[Alert Admin & Use Last Known Data];
 ```
