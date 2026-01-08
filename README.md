@@ -19,15 +19,18 @@
 
 ## 4. Lộ trình phát triển (Development Milestones)
 
-### Milestone 1: Foundation & The Gatekeeper
+### Milestone 1: Foundation & The Gatekeeper (COMPLETED)
 - [x] Khởi tạo dự án (Vite).
 - [x] Thiết kế Design System (Colors, Typography, Effects).
 - [x] Xây dựng Landing Page (Hero, Features).
 - [x] Tích hợp Mock Authentication & Blur Effect.
+- [x] **New:** Pricing Section & Testimonials.
+- [x] **New:** Interactive Dashboard Simulation (Recharts).
+- [x] **New:** Responsive Design & Mobile Menu.
 
 ### Milestone 2: Expansion
 - [ ] Nâng cấp bộ máy quét dữ liệu (Global setup).
-- [ ] Tích hợp Real Data vào Dashboard.
+- [ ] Tích hợp Real Data vào Dashboard (Backend Integration).
 
 ### Milestone 3: Real-time
 - [ ] Chuyển đổi EOD sang Intraday.
