@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity, Radio, Shield, Zap, TrendingUp, TrendingDown, Clipboard, Check, Lock, AlertTriangle } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
 
-// --- MOCK DATA FOR MVP ---
-const MVP_SIGNALS = [
+// --- CONFIGURATION ---
+const supabaseUrl = 'https://gvglzvjsexeaectypkyk.supabase.co';
+const supabaseKey = 'sb_publishable_twPEMyojWMfPXfubNA3C3g_xqAAwPHq'; // User provided key
+
+// Create Client
+let supabase = null;
+try {
+    supabase = createClient(supabaseUrl, supabaseKey);
+} catch (e) {
+    console.error("Supabase Init Error:", e);
+}
+
+// --- MOCK DATA (Fallback) ---
+const MOCK_SIGNALS = [
     { id: 1, pair: 'EUR/USD', type: 'LONG', entry: 1.0520, tp: 1.0580, sl: 1.0490, rr: '1:2', conf: 92, status: 'ACTIVE', time: '5m ago' },
     { id: 2, pair: 'GBP/USD', type: 'SHORT', entry: 1.2750, tp: 1.2650, sl: 1.2800, rr: '1:2', conf: 85, status: 'PROFIT', time: '2h ago' },
-    { id: 3, pair: 'XAU/USD', type: 'LONG', entry: 2035.5, tp: 2050.0, sl: 2028.0, rr: '1:2.5', conf: 88, status: 'ACTIVE', time: '15m ago' },
-    { id: 4, pair: 'USD/JPY', type: 'SHORT', entry: 144.20, tp: 143.50, sl: 144.60, rr: '1:2', conf: 75, status: 'LOSS', time: 'Yesterday' },
 ];
 
 const MVP_STATS = {
@@ -102,9 +113,81 @@ function StatsCard({ label, value, sub }) {
 
 export default function AppMVP() {
     const [chartData, setChartData] = useState([]);
+    const [signals, setSignals] = useState(MOCK_SIGNALS);
+
+    // FETCH REAL DATA
+    useEffect(() => {
+        if (!supabase) return;
+
+        console.log("🔌 Connected to Supabase, fetching signals...");
+
+        const fetchSignals = async () => {
+            const { data, error } = await supabase
+                .from('ai_signals')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(10); // Get latest 10
+
+            if (data && !error && data.length > 0) {
+                console.log("✅ Got Signals:", data.length);
+                const realSignals = data.map(d => ({
+                    id: d.id,
+                    pair: d.symbol,
+                    type: d.signal_type || 'WATCH',
+                    entry: parseFloat(d.predicted_close || 0).toFixed(4),
+                    // Mock SL/TP calculation if not in DB, assuming Long logic for demo
+                    // In production scanner, SL/TP should be saved in DB
+                    tp: (d.predicted_close * (d.signal_type === 'SHORT' ? 0.99 : 1.01)).toFixed(4),
+                    sl: (d.predicted_close * (d.signal_type === 'SHORT' ? 1.005 : 0.995)).toFixed(4),
+                    rr: '1:2',
+                    conf: d.confidence_score,
+                    status: 'ACTIVE', // Default to active for new signals
+                    time: new Date(d.created_at).toLocaleTimeString()
+                }));
+                setSignals(realSignals);
+            } else {
+                console.log("⚠️ No signals found in DB or Error:", error);
+            }
+        };
+
+        fetchSignals();
+
+        // Subscription would go here if Realtime is enabled on Table
+        const channel = supabase
+            .channel('table-db-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'ai_signals',
+                },
+                (payload) => {
+                    console.log("🔔 Realtime Update:", payload);
+                    const d = payload.new;
+                    const newSignal = {
+                        id: d.id,
+                        pair: d.symbol,
+                        type: d.signal_type || 'WATCH',
+                        entry: parseFloat(d.predicted_close || 0).toFixed(4),
+                        tp: (d.predicted_close * (d.signal_type === 'SHORT' ? 0.99 : 1.01)).toFixed(4),
+                        sl: (d.predicted_close * (d.signal_type === 'SHORT' ? 1.005 : 0.995)).toFixed(4),
+                        rr: '1:2',
+                        conf: d.confidence_score,
+                        status: 'JUST IN',
+                        time: 'Now'
+                    };
+                    setSignals(prev => [newSignal, ...prev]);
+                }
+            )
+            .subscribe();
+
+        return () => supabase.removeChannel(channel);
+
+    }, []);
 
     useEffect(() => {
-        // Mock chart data generation
+        // Mock chart
         const data = [];
         let price = 1.0500;
         for (let i = 0; i < 20; i++) {
@@ -129,7 +212,7 @@ export default function AppMVP() {
 
             <main className="container" style={{ padding: '2rem 1rem' }}>
 
-                {/* HERO SECTION */}
+                {/* HERO */}
                 <section style={{ textAlign: 'center', marginBottom: '3rem', paddingTop: '2rem' }}>
                     <h1 style={{ fontSize: '2.5rem', lineHeight: '1.2', marginBottom: '1rem' }}>
                         EUR/USD Live AI Signals <br /> <span className="text-gradient">MVP Edition</span>
@@ -143,14 +226,14 @@ export default function AppMVP() {
                     </p>
                 </section>
 
-                {/* PERFORMANCE STATS */}
+                {/* STATS */}
                 <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', marginBottom: '3rem' }}>
                     <StatsCard label="Total Trades (7D)" value={MVP_STATS.trades} />
                     <StatsCard label="Win Rate" value={MVP_STATS.winRate} sub={MVP_STATS.streak} />
                     <StatsCard label="Avg. Profit" value={MVP_STATS.avgProfit} />
                 </section>
 
-                {/* LIVE CHART SIMULATION */}
+                {/* CHART */}
                 <section className="glass-panel" style={{ padding: '1.5rem', marginBottom: '3rem', height: '300px' }}>
                     <h3 style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between' }}>
                         <span>Live Market Trend (1H)</span>
@@ -174,13 +257,13 @@ export default function AppMVP() {
                 <section>
                     <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem' }}>Active AI Signals</h2>
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                        {MVP_SIGNALS.map(s => (
+                        {signals.map(s => (
                             <SignalRow key={s.id} s={s} />
                         ))}
                     </div>
                 </section>
 
-                {/* DISCLAIMER */}
+                {/* FOOTER */}
                 <footer style={{ marginTop: '4rem', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem' }}>
                     <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                         <AlertTriangle size={16} color="orange" />
