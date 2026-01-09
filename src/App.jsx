@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { LineChart, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Shield, Globe, Zap, Lock, ChevronRight, Activity, TrendingUp, X, User, LogOut, Check, Star, Briefcase, Cpu, Radio, Menu } from 'lucide-react';
+import { Shield, Globe, Zap, Lock, ChevronRight, Activity, TrendingUp, X, User, LogOut, Check, Star, Briefcase, Cpu, Radio, Menu, CheckCircle } from 'lucide-react';
 import InvestorConcierge from './components/InvestorConcierge';
 
 const TRANSLATIONS = {
@@ -201,7 +201,7 @@ function Navbar({ t, onLoginClick, isLoggedIn, onLogout }) {
               <a href="#pricing" onClick={(e) => scrollToSection(e, 'pricing')} className="nav-link">{t.nav.pricing}</a>
             </>
           )}
-          <a href="#/investment" className="nav-link" style={{
+          <a href="#/investment" className="nav-link" onClick={() => window.scrollTo(0, 0)} style={{
             background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
@@ -241,7 +241,7 @@ function Navbar({ t, onLoginClick, isLoggedIn, onLogout }) {
               <a href="#pricing" className="nav-link" onClick={(e) => scrollToSection(e, 'pricing')} style={{ fontSize: '1.2rem' }}>{t.nav.pricing}</a>
             </>
           )}
-          <a href="#/investment" className="nav-link" onClick={() => setMobileMenuOpen(false)} style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2rem' }}>💎 Investment Thesis</a>
+          <a href="#/investment" className="nav-link" onClick={() => { setMobileMenuOpen(false); window.scrollTo(0, 0); }} style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2rem' }}>💎 Investment Thesis</a>
           <a href="https://9dpi.github.io/vn30/" target="_blank" className="nav-link" style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.2rem' }}>{t.nav.vn30}</a>
 
           {isLoggedIn ? (
@@ -753,6 +753,7 @@ function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     document.title = "Quantix AI Forecast";
   }, []);
 
@@ -804,7 +805,7 @@ function App() {
             <BacktestSection />
 
             <div id="signals">
-              <SignalsSection t={t} isLoggedIn={isLoggedIn} onLoginClick={() => setShowLoginModal(true)} />
+              <SignalsSection t={t} isLoggedIn={isLoggedIn} onUnlock={() => setShowLoginModal(true)} />
             </div>
 
             <div id="pricing">
@@ -822,33 +823,22 @@ function App() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
                 <Activity color="var(--primary)" size={24} />
-                <span style={{ fontWeight: '700', fontFamily: 'var(--font-heading)', fontSize: '1.2rem' }}>Quantix AI Forecast</span>
+                <span style={{ fontWeight: '700', fontFamily: 'var(--font-heading)', fontSize: '1.2rem' }}>Signal Genius AI</span>
               </div>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.9rem' }}>
-                The next generation of automated quantitative trading. Precision signals, institutional-grade infrastructure.
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.9rem', maxWidth: '400px' }}>
+                Total Market Vision - Personalized Asset Focus. Institutional-grade quantitative infrastructure.
               </p>
             </div>
 
-            <div>
-              <h4 style={{ color: 'white', marginBottom: '1.5rem' }}>Technology Stack</h4>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-                {['Gemini 1.5 Pro', 'Python', 'Redis', 'Supabase', 'React'].map(tech => (
-                  <span key={tech} style={{
-                    padding: '4px 12px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)',
-                    fontSize: '0.75rem', color: 'var(--primary)', border: '1px solid rgba(255,215,0,0.2)'
-                  }}>
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ textAlign: 'right' }}>
+            <div style={{ textAlign: 'right', gridColumn: 'span 2' }}>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
-                © 2026 Quantix AI Forecast.
+                © 2026 Signal Genius AI.
               </p>
               <p style={{ color: 'var(--primary)', fontSize: '0.75rem', marginTop: '4px', fontWeight: '600' }}>
-                Powered by Quantix AI Core v1.5
+                Powered by Quantix AI Core v1.5. Institutional Division.
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.7rem', marginTop: '8px' }}>
+                Confidential Investment Materials
               </p>
             </div>
           </div>
