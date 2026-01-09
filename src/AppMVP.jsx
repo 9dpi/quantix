@@ -101,9 +101,9 @@ const SignalTableRow = memo(({ signal }) => {
 
 // 2. Live Ticker Component: Handles high-frequency updates independently
 const LiveTicker = memo(({ initialPrice }) => {
-    // Initial static data
+    // NO MORE HARDCODED DEFAULTS - Only real data from database
     const [data, setData] = useState({
-        price: initialPrice || 1.1650, // Updated default to match 2026 expected range if no signal
+        price: initialPrice || null,
         trend1H: 'BULLISH',
         trend15M: 'BULLISH',
         aiConfidence: 87

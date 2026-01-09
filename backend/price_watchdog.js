@@ -313,6 +313,24 @@ async function watchSignals() {
                 if (alertMessage) {
                     await sendTelegramAlert(alertMessage);
                 }
+            } else {
+                // CRITICAL: Always update current_price even if status unchanged
+                // This ensures frontend displays REAL-TIME prices matching TradingView
+                const client = await pool.connect();
+                try {
+                    await client.query(
+                        `UPDATE ai_signals 
+                         SET current_price = $1, 
+                             last_checked_at = NOW() 
+                         WHERE id = $2`,
+                        [currentPrice, signal.id]
+                    );
+                    console.log(`📍 Updated price for Signal ${signal.id}: ${currentPrice}`);
+                } catch (error) {
+                    console.error("❌ Price Update Error:", error.message);
+                } finally {
+                    client.release();
+                }
             }
         }
 
