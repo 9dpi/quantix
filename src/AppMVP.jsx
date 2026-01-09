@@ -117,32 +117,169 @@ const LiveTicker = memo(({ initialPrice }) => {
     }, [initialPrice]);
 
     return (
-        <section className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', background: 'linear-gradient(135deg, rgba(0,240,255,0.05) 0%, rgba(0,186,136,0.05) 100%)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '20px', alignItems: 'center' }}>
-                <div>
-                    <h1 style={{ fontSize: '3rem', fontWeight: 'bold', color: 'white', marginBottom: '5px' }}>EUR/USD</h1>
-                    <p style={{ fontSize: '2.5rem', color: '#00F0FF', fontWeight: 'bold', fontFamily: 'monospace' }}>
+        <section className="glass-panel" style={{ padding: '1.5rem', marginBottom: '2rem', background: 'linear-gradient(135deg, rgba(0,240,255,0.05) 0%, rgba(0,186,136,0.05) 100%)' }}>
+            {/* Top Row: Price + AI Confidence */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', marginBottom: '8px', fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase' }}>EUR/USD Live Rate</p>
+                    <p style={{ fontSize: '2.5rem', color: '#00F0FF', fontWeight: 'bold', fontFamily: 'monospace', margin: 0, textShadow: '0 0 20px rgba(0,240,255,0.4)' }}>
                         {data.price ? data.price.toFixed(4) : "---"}
                     </p>
                 </div>
+
                 <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.85rem', color: '#999', marginBottom: '5px' }}>1H Trend</p>
-                    <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: data.trend1H === 'BULLISH' ? '#00BA88' : '#FF0055' }}>
-                        {data.trend1H === 'BULLISH' ? '↗ BULLISH' : '↘ BEARISH'}
+                    <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', marginBottom: '8px', fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase' }}>AI Confidence</p>
+                    <p style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#FFD700', margin: 0 }}>{data.aiConfidence}%</p>
+                </div>
+            </div>
+
+            {/* Bottom Row: Trends */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '1rem',
+                borderTop: '1px solid rgba(255,255,255,0.1)',
+                paddingTop: '1.5rem'
+            }}>
+                <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: '6px', fontWeight: '600', letterSpacing: '0.5px', textTransform: 'uppercase' }}>1H Trend</p>
+                    <p style={{
+                        fontSize: '1.1rem',
+                        fontWeight: 'bold',
+                        color: data.trend1H === 'BULLISH' ? '#00BA88' : '#FF0055',
+                        margin: 0
+                    }}>
+                        {data.trend1H === 'BULLISH' ? '↗ ' : '↘ '}{data.trend1H}
                     </p>
                 </div>
+
                 <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.85rem', color: '#999', marginBottom: '5px' }}>15M Trend</p>
-                    <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: data.trend15M === 'BULLISH' ? '#00BA88' : '#FF0055' }}>
-                        {data.trend15M === 'BULLISH' ? '↗ BULLISH' : '↘ BEARISH'}
+                    <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: '6px', fontWeight: '600', letterSpacing: '0.5px', textTransform: 'uppercase' }}>15M Trend</p>
+                    <p style={{
+                        fontSize: '1.1rem',
+                        fontWeight: 'bold',
+                        color: data.trend15M === 'BULLISH' ? '#00BA88' : '#FF0055',
+                        margin: 0
+                    }}>
+                        {data.trend15M === 'BULLISH' ? '↗ ' : '↘ '}{data.trend15M}
                     </p>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.85rem', color: '#999', marginBottom: '5px' }}>AI Confidence</p>
-                    <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#FFD700' }}>{data.aiConfidence}%</p>
                 </div>
             </div>
         </section>
+    );
+});
+
+// Mobile Card Component
+const SignalMobileCard = memo(({ signal }) => {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = useCallback(() => {
+        const text = `${signal.action} ${signal.pair} @ ${signal.entry}\nSL: ${signal.sl} | TP1: ${signal.tp1} | TP2: ${signal.tp2}`;
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    }, [signal]);
+
+    const getStatusBadge = (status) => {
+        const badges = {
+            'WAITING': { text: 'Waiting', color: '#999', icon: null },
+            'ENTRY_HIT': { text: 'Entry Hit', color: '#00BA88', icon: <Check size={14} /> },
+            'TP1_HIT': { text: 'TP1 Hit ✓', color: '#00BA88', icon: <Target size={14} /> },
+            'TP2_HIT': { text: 'TP2 Hit ✓✓', color: '#FFD700', icon: <Target size={14} /> },
+            'SL_HIT': { text: 'SL Hit', color: '#FF0055', icon: <XCircle size={14} /> },
+        };
+        const badge = badges[status] || badges['WAITING'];
+        return (
+            <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '4px 10px',
+                borderRadius: '12px',
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                background: `${badge.color}20`,
+                color: badge.color,
+                border: `1px solid ${badge.color}40`
+            }}>
+                {badge.icon} {badge.text}
+            </span>
+        );
+    };
+
+    return (
+        <div style={{
+            background: 'rgba(255,255,255,0.08)',
+            borderLeft: `4px solid ${signal.action === 'BUY' ? '#00BA88' : '#FF0055'}`,
+            borderRadius: '12px',
+            padding: '1.25rem',
+            marginBottom: '1rem',
+            border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <span style={{
+                    fontWeight: 'bold',
+                    fontSize: '1.2rem',
+                    color: signal.action === 'BUY' ? '#00BA88' : '#FF0055',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                }}>
+                    {signal.action === 'BUY' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                    {signal.action} {signal.pair}
+                </span>
+                {getStatusBadge(signal.status)}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div style={{ background: 'rgba(0,240,255,0.08)', padding: '0.75rem', borderRadius: '10px', border: '1px solid rgba(0,240,255,0.2)' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px', fontWeight: '600', letterSpacing: '0.5px' }}>ENTRY PRICE</p>
+                    <p style={{ fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'monospace', color: '#00F0FF' }}>{signal.entry}</p>
+                </div>
+                <div style={{ background: 'rgba(255,215,0,0.08)', padding: '0.75rem', borderRadius: '10px', border: '1px solid rgba(255,215,0,0.2)' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px', fontWeight: '600', letterSpacing: '0.5px' }}>RISK/REWARD</p>
+                    <p style={{ fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'monospace', color: '#FFD700' }}>{signal.rr}</p>
+                </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <div style={{ textAlign: 'center', padding: '0.75rem', background: 'rgba(255,0,85,0.15)', borderRadius: '10px', border: '1px solid rgba(255,0,85,0.3)' }}>
+                    <p style={{ fontSize: '0.7rem', color: '#FF0055', marginBottom: '4px', fontWeight: 'bold' }}>STOP LOSS</p>
+                    <p style={{ fontSize: '1.1rem', fontFamily: 'monospace', fontWeight: 'bold', color: 'white' }}>{signal.sl}</p>
+                </div>
+                <div style={{ textAlign: 'center', padding: '0.75rem', background: 'rgba(0,186,136,0.15)', borderRadius: '10px', border: '1px solid rgba(0,186,136,0.3)' }}>
+                    <p style={{ fontSize: '0.7rem', color: '#00BA88', marginBottom: '4px', fontWeight: 'bold' }}>TARGET 1</p>
+                    <p style={{ fontSize: '1.1rem', fontFamily: 'monospace', fontWeight: 'bold', color: 'white' }}>{signal.tp1}</p>
+                </div>
+                <div style={{ textAlign: 'center', padding: '0.75rem', background: 'rgba(255,215,0,0.15)', borderRadius: '10px', border: '1px solid rgba(255,215,0,0.3)' }}>
+                    <p style={{ fontSize: '0.7rem', color: '#FFD700', marginBottom: '4px', fontWeight: 'bold' }}>TARGET 2</p>
+                    <p style={{ fontSize: '1.1rem', fontFamily: 'monospace', fontWeight: 'bold', color: 'white' }}>{signal.tp2}</p>
+                </div>
+            </div>
+
+            <button
+                onClick={handleCopy}
+                style={{
+                    width: '100%',
+                    background: copied ? '#00BA88' : 'rgba(0,186,136,0.2)',
+                    border: `2px solid ${copied ? '#00BA88' : '#00BA88'}`,
+                    color: copied ? 'white' : '#00BA88',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                    transition: 'all 0.2s'
+                }}
+            >
+                {copied ? <Check size={18} /> : <Clipboard size={18} />}
+                {copied ? 'Signal Copied!' : 'Copy Signal'}
+            </button>
+        </div>
     );
 });
 
@@ -155,7 +292,8 @@ const SignalList = memo(({ signals, loadingState }) => {
                 Active Trading Signals
             </h2>
 
-            <div className="glass-panel" style={{ padding: '0', overflowX: 'auto' }}>
+            {/* Desktop Table View */}
+            <div className="glass-panel desktop-view-only" style={{ padding: '0', overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
                     <thead>
                         <tr style={{ background: 'rgba(0,240,255,0.1)', borderBottom: '2px solid rgba(0,240,255,0.3)' }}>
@@ -207,6 +345,25 @@ const SignalList = memo(({ signals, loadingState }) => {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="mobile-view-only" style={{ display: 'none' }}>
+                {loadingState === 'CONNECTING' ? (
+                    <div style={{ textAlign: 'center', padding: '3rem' }}>
+                        <div className="animate-spin" style={{ display: 'inline-block', marginBottom: '1rem' }}>
+                            <Activity size={30} color="#00F0FF" />
+                        </div>
+                        <p style={{ color: '#999' }}>Connecting...</p>
+                    </div>
+                ) : signals.length === 0 ? (
+                    <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem' }}>
+                        <AlertTriangle size={30} color="#FFD700" />
+                        <p style={{ color: 'white', marginTop: '1rem' }}>Waiting for Signals</p>
+                    </div>
+                ) : (
+                    signals.map(s => <SignalMobileCard key={s.id} signal={s} />)
+                )}
             </div>
         </section>
     );
@@ -314,14 +471,14 @@ export default function AppMVP() {
             <nav className="glass-panel" style={{ padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, borderRadius: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Activity color="#00F0FF" size={24} />
-                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'white' }}>AI Forecast <span style={{ fontSize: '0.8rem', border: '1px solid #FFD700', padding: '2px 6px', borderRadius: '4px', color: '#FFD700' }}>FOREX</span></span>
+                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'white' }}>Signal Genius <span style={{ fontSize: '0.8rem', border: '1px solid #00F0FF', padding: '2px 6px', borderRadius: '4px', color: '#00F0FF' }}>AI</span></span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#00BA88' }}>
                     <Radio size={16} className="animate-pulse" /> LIVE MONITORING
                 </div>
             </nav>
 
-            <main className="container" style={{ padding: '2rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
+            <main className="container" style={{ padding: '2rem 0' }}>
                 <LiveTicker initialPrice={currentPrice} />
                 <SignalList signals={signals} loadingState={loadingState} />
 
@@ -331,8 +488,11 @@ export default function AppMVP() {
                         <AlertTriangle size={16} color="orange" />
                         Educational purposes only. Past performance does not guarantee future results.
                     </p>
+                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginTop: '0.75rem', fontWeight: '500' }}>
+                        Powered by <span style={{ color: '#00F0FF' }}>Quantix AI Core v1.5</span>
+                    </p>
                     <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginTop: '0.5rem' }}>
-                        &copy; 2024 AI Smart Forecast. Forex Edition for Professional Traders.
+                        &copy; 2026 Signal Genius AI. Forensic Market Analysis System.
                     </p>
                 </footer>
             </main>

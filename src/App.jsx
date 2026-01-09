@@ -6,7 +6,7 @@ const TRANSLATIONS = {
   en: {
     nav: { features: 'Features', signals: 'Live Signals', pricing: 'Pricing', login: 'Login', logout: 'Logout', vn30: 'VN30 App' },
     hero: {
-      badge: '✨ V1.0 Stable on VN30',
+      badge: '✨ Quantix AI Core v1.5',
       title1: 'Predict the Future of',
       title2: 'Market Trends',
       desc: '100% Automated Stock Prediction System. Powered by advanced AI algorithms to analyze market volatility and execute precise signals.',
@@ -59,7 +59,7 @@ const TRANSLATIONS = {
     },
     testimonials: {
       title: 'Trusted by Traders',
-      subtitle: 'See what our community has to say about AI Forecast.',
+      subtitle: 'See what our community has to say about Signal Genius AI.',
       t1: { name: 'Alex Nguyen', role: 'Day Trader', content: 'The accuracy is frighteningly good. I recovered my subscription fee in the first trade.' },
       t2: { name: 'Sarah Le', role: 'Office Worker', content: 'I don\'t have time to watch the screen. The automated signals let me trade while I work. Game changer.' },
       t3: { name: 'Michael Tran', role: 'Crypto Investor', content: 'The dark mode UI is beautiful, but the AI algorithms are the real deal. High win rate on VN30.' }
@@ -68,7 +68,7 @@ const TRANSLATIONS = {
   vi: {
     nav: { features: 'Tính năng', signals: 'Tín hiệu Live', pricing: 'Bảng giá', login: 'Đăng nhập', logout: 'Đăng xuất', vn30: 'VN30 App' },
     hero: {
-      badge: '✨ Phiên bản V1.0 Ổn định trên VN30',
+      badge: '✨ Quantix AI Core v1.5',
       title1: 'Dự báo Tương lai',
       title2: 'Xu hướng Thị trường',
       desc: 'Hệ thống dự báo chứng khoán tự động hóa 100%. Sử dụng thuật toán AI tiên tiến để phân tích biến động và đưa ra tín hiệu chính xác.',
@@ -121,7 +121,7 @@ const TRANSLATIONS = {
     },
     testimonials: {
       title: 'Nhà đầu tư tin dùng',
-      subtitle: 'Cộng đồng nói gì về AI Smart Forecast.',
+      subtitle: 'Cộng đồng nói gì về Signal Genius AI.',
       t1: { name: 'Alex Nguyễn', role: 'Day Trader', content: 'Độ chính xác thực sự đáng sợ. Tôi đã thu hồi vốn phí đăng ký ngay trong lệnh đầu tiên.' },
       t2: { name: 'Sarah Lê', role: 'Nhân viên VP', content: 'Tôi không có thời gian canh bảng. Tín hiệu tự động giúp tôi giao dịch ngay cả khi đang làm việc. Quá đỉnh.' },
       t3: { name: 'Michael Trần', role: 'Nhà đầu tư Crypto', content: 'Giao diện Dark mode rất đẹp, nhưng thuật toán AI mới là thứ đáng tiền. Tỷ lệ thắng cao trên VN30.' }
@@ -159,7 +159,7 @@ function Navbar({ lang, setLang, t, onLoginClick, isLoggedIn, onLogout }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.location.reload()}>
           <Activity color="var(--primary)" size={28} />
           <span style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-heading)' }}>
-            AI <span className="text-gradient">Forecast</span>
+            Signal <span className="text-gradient">Genius</span> AI
           </span>
         </div>
 
@@ -745,7 +745,7 @@ function App() {
         t={t}
       />
 
-      <main>
+      <main className="container">
         {isLoggedIn ? (
           <Dashboard t={t} />
         ) : (
@@ -755,7 +755,7 @@ function App() {
             <section id="features" className="container" style={{ padding: '4rem 2rem' }}>
               <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
                 <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-                  {t.features.title} <span className="text-gradient">AI Forecast?</span>
+                  {t.features.title} <span className="text-gradient">Signal Genius AI?</span>
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem' }}>{t.features.subtitle}</p>
               </div>
@@ -786,11 +786,16 @@ function App() {
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Activity color="var(--primary)" size={24} />
-            <span style={{ fontWeight: '700', fontFamily: 'var(--font-heading)' }}>AI Forecast</span>
+            <span style={{ fontWeight: '700', fontFamily: 'var(--font-heading)' }}>Signal Genius AI</span>
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            © 2024 AI Smart Forecast Commercial. All rights reserved.
-          </p>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
+              © 2026 Signal Genius AI. All rights reserved.
+            </p>
+            <p style={{ color: 'var(--primary)', fontSize: '0.75rem', marginTop: '4px', fontWeight: '500', opacity: 0.8 }}>
+              Powered by Quantix AI Core v1.5
+            </p>
+          </div>
         </div>
       </footer>
     </div>
