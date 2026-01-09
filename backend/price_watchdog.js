@@ -24,6 +24,10 @@ const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 // --- ALPHA VANTAGE API CONFIG ---
 const ALPHA_VANTAGE_KEY = process.env.ALPHA_VANTAGE_KEY || 'Z9JGV0STF4PE6C61';
 
+// --- PRICE CONFIRMATION BUFFER (Anti-Wick) ---
+const priceConfirmationBuffer = new Map(); // signalId -> { price, count, timestamp }
+const CONFIRMATION_THRESHOLD = 2; // Cần 2 lần check liên tiếp để xác nhận
+
 /**
  * Lấy giá EUR/USD từ Alpha Vantage (Real-time Forex)
  */
@@ -35,7 +39,7 @@ async function getAlphaVantagePrice() {
         }
 
         const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=EUR&to_currency=USD&apikey=${ALPHA_VANTAGE_KEY}`;
-        const response = await fetch(url);
+        const response = await fetch(url, { timeout: 5000 }); // 5s timeout
 
         if (!response.ok) {
             throw new Error(`Alpha Vantage API Error: ${response.status}`);
@@ -64,23 +68,96 @@ async function getAlphaVantagePrice() {
  */
 async function getYahooPrice() {
     try {
-        const response = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/EURUSD=X?interval=1m&range=1d');
+        const response = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/EURUSD=X?interval=1m&range=1d', { timeout: 5000 });
         const data = await response.json();
         const price = data.chart.result[0].meta.regularMarketPrice;
         console.log(`📊 Yahoo EUR/USD (Fallback): ${price}`);
         return price;
     } catch (error) {
         console.error("❌ Yahoo Fetch Error:", error.message);
+        // Last resort: Return null and skip this cycle
         return null;
     }
 }
 
 /**
- * Gửi Alert qua Telegram
+ * TELEGRAM MESSAGE TEMPLATES
+ */
+const TelegramTemplates = {
+    newSignal: (signal, entry, sl, tp1, tp2) => `
+🚨 *NEW SIGNAL DETECTED*
+
+📊 *Pair:* EUR/USD
+🎯 *Action:* ${signal.signal_type === 'LONG' ? '🟢 BUY' : '🔴 SELL'}
+💰 *Entry:* ${entry}
+🛑 *Stop Loss:* ${sl}
+🎯 *TP1:* ${tp1}
+🎯 *TP2:* ${tp2}
+📈 *AI Confidence:* ${signal.confidence_score}%
+
+⏰ _${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' })}_
+`,
+
+    entryHit: (signalType, entry, currentPrice, sl, tp1, tp2) => `
+✅ *ENTRY HIT - POSITION OPENED*
+
+📊 *EUR/USD ${signalType === 'LONG' ? '🟢 BUY' : '🔴 SELL'}*
+💰 *Entry Price:* ${entry}
+📍 *Current Price:* ${currentPrice}
+
+🛑 *Stop Loss:* ${sl}
+🎯 *TP1:* ${tp1}
+🎯 *TP2:* ${tp2}
+
+⚡ _Trade is now ACTIVE. Monitoring in progress..._
+`,
+
+    tp1Hit: (signalType, entry, tp1, currentPrice) => `
+💰 *TP1 HIT - PARTIAL PROFIT!*
+
+📊 *EUR/USD ${signalType === 'LONG' ? '🟢 BUY' : '🔴 SELL'}*
+💰 *Entry:* ${entry} → *TP1:* ${tp1}
+📍 *Current:* ${currentPrice}
+
+✅ *Recommendation:* Move SL to breakeven
+🎯 *Next Target:* TP2
+
+⏰ _${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' })}_
+`,
+
+    tp2Hit: (signalType, entry, tp2, currentPrice) => `
+💰💰 *TP2 HIT - FULL PROFIT SECURED!*
+
+📊 *EUR/USD ${signalType === 'LONG' ? '🟢 BUY' : '🔴 SELL'}*
+💰 *Entry:* ${entry} → *TP2:* ${tp2}
+📍 *Current:* ${currentPrice}
+
+🎉 *Status:* Trade completed successfully!
+✅ *Action:* Close all positions
+
+⏰ _${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' })}_
+`,
+
+    slHit: (signalType, entry, sl, currentPrice) => `
+❌ *STOP LOSS HIT*
+
+📊 *EUR/USD ${signalType === 'LONG' ? '🟢 BUY' : '🔴 SELL'}*
+💰 *Entry:* ${entry} → *SL:* ${sl}
+📍 *Current:* ${currentPrice}
+
+⚠️ *Status:* Position closed with loss
+🔄 *Next:* Wait for new signal
+
+⏰ _${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' })}_
+`
+};
+
+/**
+ * Gửi Alert qua Telegram với Template
  */
 async function sendTelegramAlert(message) {
     if (!bot || !CHAT_ID) {
-        console.log("📢 Telegram Alert (Not configured):", message);
+        console.log("📢 Telegram Alert (Not configured):", message.replace(/\*/g, '').substring(0, 100) + '...');
         return;
     }
 
@@ -90,6 +167,35 @@ async function sendTelegramAlert(message) {
     } catch (error) {
         console.error("❌ Telegram Error:", error.message);
     }
+}
+
+/**
+ * Xác nhận giá với Anti-Wick Logic
+ */
+function confirmPriceLevel(signalId, currentPrice, targetPrice, tolerance = 0.0005) {
+    const key = `${signalId}_${targetPrice}`;
+    const isHit = Math.abs(currentPrice - targetPrice) <= tolerance;
+
+    if (!isHit) {
+        // Giá không chạm, reset buffer
+        priceConfirmationBuffer.delete(key);
+        return false;
+    }
+
+    // Giá chạm, tăng counter
+    const existing = priceConfirmationBuffer.get(key) || { count: 0, timestamp: Date.now() };
+    existing.count += 1;
+    existing.timestamp = Date.now();
+    priceConfirmationBuffer.set(key, existing);
+
+    // Xác nhận nếu đủ số lần
+    if (existing.count >= CONFIRMATION_THRESHOLD) {
+        priceConfirmationBuffer.delete(key); // Clear sau khi confirm
+        return true;
+    }
+
+    console.log(`⏳ Price confirmation ${existing.count}/${CONFIRMATION_THRESHOLD} for ${key}`);
+    return false;
 }
 
 /**
@@ -163,16 +269,16 @@ async function watchSignals() {
             let newStatus = currentStatus;
             let alertMessage = null;
 
-            // --- LOGIC TREE ---
+            // --- LOGIC TREE với Anti-Wick ---
             if (currentStatus === 'WAITING') {
                 // Chưa vào lệnh, check xem giá có chạm Entry chưa
                 const entryHit = signalType === 'LONG'
                     ? currentPrice <= entry
                     : currentPrice >= entry;
 
-                if (entryHit) {
+                if (entryHit && confirmPriceLevel(signal.id, currentPrice, entry)) {
                     newStatus = 'ENTRY_HIT';
-                    alertMessage = `🎯 *ENTRY HIT*\n${signalType} EUR/USD @ ${entry}\nCurrent: ${currentPrice}\nSL: ${sl.toFixed(4)} | TP1: ${tp1.toFixed(4)} | TP2: ${tp2.toFixed(4)}`;
+                    alertMessage = TelegramTemplates.entryHit(signalType, entry.toFixed(4), currentPrice.toFixed(4), sl.toFixed(4), tp1.toFixed(4), tp2.toFixed(4));
                 }
             }
             else if (currentStatus === 'ENTRY_HIT' || currentStatus === 'TP1_HIT') {
@@ -189,15 +295,15 @@ async function watchSignals() {
                     ? currentPrice >= tp2
                     : currentPrice <= tp2;
 
-                if (slHit) {
+                if (slHit && confirmPriceLevel(signal.id, currentPrice, sl)) {
                     newStatus = 'SL_HIT';
-                    alertMessage = `🛑 *STOP LOSS HIT*\n${signalType} EUR/USD\nEntry: ${entry} → SL: ${sl.toFixed(4)}\nCurrent: ${currentPrice}`;
-                } else if (tp2Hit) {
+                    alertMessage = TelegramTemplates.slHit(signalType, entry.toFixed(4), sl.toFixed(4), currentPrice.toFixed(4));
+                } else if (tp2Hit && confirmPriceLevel(signal.id, currentPrice, tp2)) {
                     newStatus = 'TP2_HIT';
-                    alertMessage = `💰💰 *TP2 HIT - FULL PROFIT!*\n${signalType} EUR/USD\nEntry: ${entry} → TP2: ${tp2.toFixed(4)}\nCurrent: ${currentPrice}`;
-                } else if (tp1Hit && currentStatus === 'ENTRY_HIT') {
+                    alertMessage = TelegramTemplates.tp2Hit(signalType, entry.toFixed(4), tp2.toFixed(4), currentPrice.toFixed(4));
+                } else if (tp1Hit && currentStatus === 'ENTRY_HIT' && confirmPriceLevel(signal.id, currentPrice, tp1)) {
                     newStatus = 'TP1_HIT';
-                    alertMessage = `💰 *TP1 HIT*\n${signalType} EUR/USD\nEntry: ${entry} → TP1: ${tp1.toFixed(4)}\nCurrent: ${currentPrice}\n_Moving SL to breakeven recommended._`;
+                    alertMessage = TelegramTemplates.tp1Hit(signalType, entry.toFixed(4), tp1.toFixed(4), currentPrice.toFixed(4));
                 }
             }
 
@@ -224,6 +330,7 @@ async function startWatchdog() {
     console.log("🚀 Starting Price Watchdog for EUR/USD...");
     console.log("   Data Source: Alpha Vantage (Real-time Forex)");
     console.log("   Fallback: Yahoo Finance");
+    console.log("   Anti-Wick: 2x confirmation required");
     console.log("   Check Interval: Every 10 seconds");
     console.log("-----------------------------------\n");
 
