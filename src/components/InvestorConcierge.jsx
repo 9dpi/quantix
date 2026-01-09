@@ -63,8 +63,8 @@ export default function InvestorConcierge() {
             const timer = setTimeout(() => {
                 setIsOpen(true);
                 addBotMessage(
-                    "👋 Welcome to Quantix AI Forecast! I'm your AI Investment Concierge.\n\nI can help you understand our technology, scalability, and partnership opportunities.\n\nAre you an **Individual Investor** or a **Strategic Partner**?",
-                    ['Individual Investor', 'Strategic Partner', 'Just Browsing']
+                    "👋 Welcome to Quantix AI Core v1.5! I'm your Institutional Concierge.\n\nHow can I assist your interest today?",
+                    ['💎 I want to Invest', '🤝 I want to be a Partner', '⚙️ Technical Inquiry']
                 );
                 setHasGreeted(true);
                 setStage('profiling');
@@ -98,9 +98,14 @@ export default function InvestorConcierge() {
         if (stage === 'profiling') {
             setUserProfile(prev => ({ ...prev, role: reply }));
             setTimeout(() => {
+                let followUp = "";
+                if (reply.includes('Invest')) followUp = "Fantastic. We are currently opening our Strategic Seed Round. Would you like to see our Financial Projections?";
+                else if (reply.includes('Partner')) followUp = "We love scaling through collaboration. Are you interested in our API Licensing or Local Distribution?";
+                else followUp = "Our v1.5 Core utilizes Semantic Caching and Hybrid Model routing. What technical aspects can I clarify?";
+
                 addBotMessage(
-                    `Excellent! As a ${reply}, you'll be interested in our scalability and cost-efficiency.\n\nWhat would you like to know more about?`,
-                    QUICK_REPLIES.map(q => q.text)
+                    followUp,
+                    reply.includes('Invest') ? ["Yes, show projections", "Tell me more"] : QUICK_REPLIES.map(q => q.text)
                 );
                 setStage('consulting');
             }, 800);

@@ -7,19 +7,15 @@ html {
 :root {
   --neon-blue: #00F0FF;
   --neon-purple: #BC13FE;
-  --bg-dark: #050511;
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --primary-green: #00BA88;
-  --primary-red: #FF0055;
-  --primary-gold: #FFD700;
-
-  /* Landing Page specific variables */
-  --primary: #00F0FF;
-  --secondary: #7000FF;
-  --text-muted: #94A3B8;
+  --primary: #FFD700;
+  --primary-dark: #FFA500;
+  --bg-dark: #030014;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --text-main: #FFFFFF;
+  --text-muted: #A0AEC0;
+  --font-main: 'Outfit', sans-serif;
   --font-heading: 'Space Grotesk', sans-serif;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --header-height: 80px;
 }
 
 * {
@@ -27,11 +23,12 @@ html {
 }
 
 body {
-  background-color: var(--bg-dark);
-  color: white;
-  font-family: 'Outfit', sans-serif;
-  overflow-x: hidden;
   margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  overflow-x: hidden;
 }
 
 /* Layout */
@@ -43,7 +40,7 @@ body {
 
 /* Glassmorphism */
 .glass-panel {
-  background: var(--glass-bg);
+  background: var(--bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);

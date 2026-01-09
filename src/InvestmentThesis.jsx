@@ -388,7 +388,12 @@ function InvestmentThesis() {
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            {/* FormSubmit Configuration */}
+                            <input type="hidden" name="_captcha" value="false" />
+                            <input type="hidden" name="_subject" value="🚀 [HOT LEAD] - Quantix Investor Inquiry" />
+                            <input type="hidden" name="_autoresponse" value="Thank you for your interest in Quantix AI Core v1.5. Our team has received your inquiry and will send the Executive Summary and Financial Projections to this email within the next 4 hours." />
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
                                 <input
                                     type="text"
                                     placeholder="Your Name *"
@@ -421,20 +426,36 @@ function InvestmentThesis() {
                                 />
                             </div>
 
-                            <input
-                                type="text"
-                                placeholder="Company / Organization"
-                                value={formData.company}
-                                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                                style={{
-                                    padding: '1rem',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '8px',
-                                    color: 'white',
-                                    outline: 'none'
-                                }}
-                            />
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                                <input
+                                    type="text"
+                                    placeholder="Your Role (Investor, Partner, etc.)"
+                                    value={formData.role}
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                    style={{
+                                        padding: '1rem',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '8px',
+                                        color: 'white',
+                                        outline: 'none'
+                                    }}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Organization"
+                                    value={formData.organization}
+                                    onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
+                                    style={{
+                                        padding: '1rem',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '8px',
+                                        color: 'white',
+                                        outline: 'none'
+                                    }}
+                                />
+                            </div>
 
                             <select
                                 value={formData.type}
@@ -455,8 +476,9 @@ function InvestmentThesis() {
                             </select>
 
                             <textarea
-                                placeholder="Your Message"
-                                rows="4"
+                                placeholder="Your Message or Investment Interest *"
+                                rows={4}
+                                required
                                 value={formData.message}
                                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                 style={{
@@ -466,74 +488,98 @@ function InvestmentThesis() {
                                     borderRadius: '8px',
                                     color: 'white',
                                     outline: 'none',
-                                    resize: 'vertical',
                                     fontFamily: 'inherit'
                                 }}
                             ></textarea>
 
                             <button
                                 type="submit"
-                                className="btn-primary"
                                 style={{
-                                    background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                                    color: '#000',
-                                    padding: '1rem 2rem',
-                                    fontSize: '1.1rem',
-                                    fontWeight: 'bold',
+                                    padding: '1rem',
+                                    background: 'linear-gradient(135deg, #00BA88 0%, #00F0FF 100%)',
+                                    color: 'white',
                                     border: 'none',
                                     borderRadius: '8px',
+                                    fontWeight: 'bold',
                                     cursor: 'pointer'
                                 }}
                             >
-                                Send Request
+                                Submit Inquiry
                             </button>
-
-                            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                                <button
-                                    title="Coming Soon"
-                                    onClick={(e) => { e.preventDefault(); alert('Pitch deck download link will be sent to your email after verification.'); }}
-                                    style={{
-                                        color: '#FFD700',
-                                        textDecoration: 'none',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '8px',
-                                        fontWeight: '500',
-                                        background: 'none',
-                                        border: 'none',
-                                        cursor: 'not-allowed',
-                                        fontFamily: 'inherit',
-                                        fontSize: '1rem'
-                                    }}
-                                >
-                                    <FileText size={18} />
-                                    Download One-Pager PDF
-                                </button>
-                            </div>
                         </form>
                     )}
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '3rem 2rem', marginTop: '4rem' }}>
-                <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem' }}>
-                    <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.5rem' }}>
-                            <Activity color="var(--primary)" size={24} />
-                            <span style={{ fontWeight: '700', fontFamily: 'var(--font-heading)' }}>Quantix AI Forecast</span>
+            <section style={{ padding: '6rem 2rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="container" style={{ textAlign: 'center' }}>
+                    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>Ready to Scale?</h2>
+                        <p style={{ color: 'var(--text-muted)', marginBottom: '3rem', fontSize: '1.1rem' }}>
+                            Download our confidential one-pager for a detailed technical breakdown of Quantix AI Core v1.5.
+                        </p>
+
+                        <div style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            background: 'rgba(255, 215, 0, 0.1)',
+                            padding: '1rem 2rem',
+                            borderRadius: '50px',
+                            border: '1px solid rgba(255, 215, 0, 0.3)',
+                            position: 'relative'
+                        }} title="Coming Soon">
+                            <FileText size={24} color="var(--primary)" />
+                            <span style={{ fontWeight: 'bold' }}>Download Full One-Pager</span>
+                            <span style={{
+                                position: 'absolute', top: '-10px', right: '10px',
+                                background: 'var(--primary)', color: 'black', padding: '2px 8px',
+                                borderRadius: '10px', fontSize: '0.65rem', fontWeight: 'bold'
+                            }}>COMING SOON</span>
                         </div>
-                        <p style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: '500', opacity: 0.8 }}>
-                            Powered by Quantix AI Core v1.5
-                        </p>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
-                            © 2026 Quantix AI Forecast. All rights reserved.
-                        </p>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginTop: '4px' }}>
-                            Investment materials are for qualified investors only
-                        </p>
+                </div>
+            </section>
+
+            {/* FOOTER */}
+            <footer style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '4rem 2rem', marginTop: '4rem' }}>
+                <div className="container">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '3rem', marginBottom: '3rem' }}>
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
+                                <Activity color="var(--primary)" size={24} />
+                                <span style={{ fontWeight: '700', fontFamily: 'var(--font-heading)', fontSize: '1.2rem' }}>Quantix AI Forecast</span>
+                            </div>
+                            <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.9rem' }}>
+                                Total Market Vision - Personalized Asset Focus. Institutional-grade quantitative infrastructure.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 style={{ color: 'white', marginBottom: '1.5rem' }}>Core Technology</h4>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                                {['Gemini 1.5 Pro', 'Python', 'Redis', 'Supabase', 'React'].map(tech => (
+                                    <span key={tech} style={{
+                                        padding: '4px 12px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)',
+                                        fontSize: '0.75rem', color: 'var(--primary)', border: '1px solid rgba(255,215,0,0.2)'
+                                    }}>
+                                        {tech}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div style={{ textAlign: 'right' }}>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
+                                © 2026 Quantix AI Forecast.
+                            </p>
+                            <p style={{ color: 'var(--primary)', fontSize: '0.75rem', marginTop: '4px', fontWeight: '600' }}>
+                                Powered by Quantix AI Core v1.5
+                            </p>
+                            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.7rem', marginTop: '8px' }}>
+                                Confidential Investment Materials
+                            </p>
+                        </div>
                     </div>
                 </div>
             </footer>

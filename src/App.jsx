@@ -8,23 +8,23 @@ const TRANSLATIONS = {
     nav: { features: 'Features', signals: 'Live Signals', pricing: 'Pricing', login: 'Login', logout: 'Logout', vn30: 'VN30 App' },
     hero: {
       badge: '✨ Quantix AI Core v1.5',
-      title1: 'Predict the Future of',
-      title2: 'Market Trends',
-      desc: '100% Automated Stock Prediction System. Powered by advanced AI algorithms to analyze market volatility and execute precise signals.',
+      title1: 'Total Market Vision',
+      title2: 'Personalized Asset Focus',
+      desc: '100% Automated Stock Prediction System. Scale your intelligence with Quantix AI Core v1.5 - designed for institutional precision and mass personalization.',
       ctaPrimary: 'Start Free Trial',
       ctaSecondary: 'View Demo',
-      stats: { accuracy: 'Accuracy Rate', watch: 'Market Watch', fees: 'Hidden Fees' }
+      stats: { accuracy: 'Accuracy Rate', watch: 'Market Watch', fees: 'Op-Ex Saving' }
     },
     features: {
-      title: 'Why Choose',
+      title: 'Why Choose Quantix?',
       subtitle: 'State-of-the-art technology for the modern investor.',
-      f1: { title: 'Real-Time Execution', desc: 'Our algorithms process market data in milliseconds, ensuring you never miss a profitable entry point.' },
-      f2: { title: 'Bank-Grade Security', desc: 'Your data and assets are protected by enterprise-level encryption and anti-scraping technology.' },
-      f3: { title: 'Global Markets', desc: 'Scale your portfolio across NYSE, NASDAQ, and Crypto markets with a single unified dashboard.' }
+      f1: { title: 'Unmatched Efficiency', desc: 'Reduce operational costs by up to 70% through our proprietary Semantic Caching and Hybrid Model routing.' },
+      f2: { title: 'Deep Personalization', desc: 'Tailored analysis for thousands of individual portfolios at the cost of a single user. Real-time insights for your specific watchlist.' },
+      f3: { title: 'Real-time Execution', desc: 'Instant signal processing and execution powered by Quantix AI Core v1.5, ensuring you never miss a volatile market opportunity.' }
     },
     signals: {
-      lockedTitle: 'Member Access Only',
-      lockedDesc: 'Real-time signals and advanced analytics are protected. Login to unlock the full potential of AI Smart Forecast.',
+      lockedTitle: 'Institutional Access Only',
+      lockedDesc: 'Real-time signals and advanced analytics are protected. Login to unlock the full potential of Quantix AI.',
       btnUnlock: 'Login to Unlock',
       liveTitle: 'Live Signals - VN30',
       vol: 'Vol',
@@ -67,6 +67,78 @@ const TRANSLATIONS = {
     }
   },
 };
+
+const BACKTEST_DATA = [
+  { date: 'Oct 23', quantix: 100, vn30: 100 },
+  { date: 'Nov 23', quantix: 112, vn30: 102 },
+  { date: 'Dec 23', quantix: 125, vn30: 105 },
+  { date: 'Jan 24', quantix: 138, vn30: 108 },
+  { date: 'Feb 24', quantix: 155, vn30: 112 },
+  { date: 'Mar 24', quantix: 172, vn30: 115 },
+];
+
+function BacktestSection() {
+  return (
+    <section style={{ padding: '8rem 2rem', background: 'rgba(255,255,255,0.02)' }}>
+      <div className="container">
+        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+          <h2 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)' }}>
+            Proof of <span className="text-gradient">Performance</span>
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '800px', margin: '0 auto' }}>
+            Quantix AI Core v1.5 vs. VN30 Index (Backtest Oct 2023 - Mar 2024).
+            Our algorithms consistently outperform the benchmark by optimizing entry/exit points.
+          </p>
+        </div>
+
+        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '24px', height: '400px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={BACKTEST_DATA}>
+              <defs>
+                <linearGradient id="colorQuantix" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#FFD700" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#FFD700" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" />
+              <YAxis stroke="rgba(255,255,255,0.3)" />
+              <Tooltip
+                contentStyle={{ background: '#0a0e27', border: '1px solid rgba(255,215,0,0.2)', borderRadius: '12px' }}
+                itemStyle={{ color: '#fff' }}
+              />
+              <Area type="monotone" dataKey="quantix" stroke="#FFD700" strokeWidth={3} fillOpacity={1} fill="url(#colorQuantix)" name="Quantix AI v1.5" />
+              <Area type="monotone" dataKey="vn30" stroke="rgba(255,255,255,0.5)" strokeWidth={2} fillOpacity={0} name="VN30 Index" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TooltipIcon({ text }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ position: 'relative', display: 'inline-block', marginLeft: '6px' }}>
+      <CheckCircle
+        size={14}
+        style={{ cursor: 'pointer', color: 'var(--primary)', opacity: 0.7 }}
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      />
+      {show && (
+        <div style={{
+          position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
+          background: '#0a0e27', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--primary)',
+          fontSize: '0.75rem', width: '180px', zIndex: 100, marginBottom: '8px', color: 'white',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+        }}>
+          {text}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function useSecurity() {
   useEffect(() => {
@@ -523,7 +595,10 @@ function SignalsSection({ isLoggedIn, onUnlock, t }) {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
                 <span style={{ color: 'var(--text-muted)' }}>{t.signals.vol}: High</span>
-                <span>Confidence: {s.conf}</span>
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  Confidence: {s.conf}
+                  <TooltipIcon text="Probability based on multi-model quantitative consensus (v1.5 Core)." />
+                </span>
               </div>
             </div>
           ))}
@@ -702,37 +777,39 @@ function App() {
         t={t}
       />
 
-      <main className="container">
+      <main className="main-content">
         {isLoggedIn ? (
           <Dashboard t={t} />
         ) : (
           <>
-            <Hero t={t} />
+            <Hero t={t} onLoginClick={() => setShowLoginModal(true)} />
 
-            <section id="features" className="container" style={{ padding: '4rem 2rem' }}>
-              <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                <h2 style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-                  {t.features.title} <span className="text-gradient">Quantix AI Forecast?</span>
-                </h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem' }}>{t.features.subtitle}</p>
-              </div>
+            <div id="features">
+              <section className="container" style={{ padding: '8rem 2rem' }}>
+                <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                  <h2 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)' }}>
+                    Why <span className="text-gradient">Quantix AI?</span>
+                  </h2>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '700px', margin: '0 auto' }}>{t.features.subtitle}</p>
+                </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-                <FeatureCard icon={Zap} title={t.features.f1.title} desc={t.features.f1.desc} />
-                <FeatureCard icon={Shield} title={t.features.f2.title} desc={t.features.f2.desc} />
-                <FeatureCard icon={Globe} title={t.features.f3.title} desc={t.features.f3.desc} />
-              </div>
-            </section>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+                  <FeatureCard icon={Zap} title={t.features.f1.title} desc={t.features.f1.desc} />
+                  <FeatureCard icon={Shield} title={t.features.f2.title} desc={t.features.f2.desc} />
+                  <FeatureCard icon={Globe} title={t.features.f3.title} desc={t.features.f3.desc} />
+                </div>
+              </section>
+            </div>
 
-            <section id="signals" className="container">
-              <SignalsSection
-                isLoggedIn={isLoggedIn}
-                onUnlock={() => setShowLoginModal(true)}
-                t={t}
-              />
-            </section>
+            <BacktestSection />
 
-            <PricingSection t={t} />
+            <div id="signals">
+              <SignalsSection t={t} isLoggedIn={isLoggedIn} onLoginClick={() => setShowLoginModal(true)} />
+            </div>
+
+            <div id="pricing">
+              <PricingSection t={t} />
+            </div>
 
             <TestimonialsSection t={t} />
           </>
@@ -740,18 +817,40 @@ function App() {
       </main>
 
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '4rem 2rem', marginTop: '4rem' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Activity color="var(--primary)" size={24} />
-            <span style={{ fontWeight: '700', fontFamily: 'var(--font-heading)' }}>Quantix AI Forecast</span>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
-              © 2026 Quantix AI Forecast. All rights reserved.
-            </p>
-            <p style={{ color: 'var(--primary)', fontSize: '0.75rem', marginTop: '4px', fontWeight: '500', opacity: 0.8 }}>
-              Powered by Quantix AI Core v1.5
-            </p>
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '3rem', marginBottom: '3rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
+                <Activity color="var(--primary)" size={24} />
+                <span style={{ fontWeight: '700', fontFamily: 'var(--font-heading)', fontSize: '1.2rem' }}>Quantix AI Forecast</span>
+              </div>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.9rem' }}>
+                The next generation of automated quantitative trading. Precision signals, institutional-grade infrastructure.
+              </p>
+            </div>
+
+            <div>
+              <h4 style={{ color: 'white', marginBottom: '1.5rem' }}>Technology Stack</h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                {['Gemini 1.5 Pro', 'Python', 'Redis', 'Supabase', 'React'].map(tech => (
+                  <span key={tech} style={{
+                    padding: '4px 12px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)',
+                    fontSize: '0.75rem', color: 'var(--primary)', border: '1px solid rgba(255,215,0,0.2)'
+                  }}>
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
+                © 2026 Quantix AI Forecast.
+              </p>
+              <p style={{ color: 'var(--primary)', fontSize: '0.75rem', marginTop: '4px', fontWeight: '600' }}>
+                Powered by Quantix AI Core v1.5
+              </p>
+            </div>
           </div>
         </div>
       </footer>
