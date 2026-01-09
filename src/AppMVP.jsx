@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Activity, Radio, Shield, Zap, TrendingUp, TrendingDown, Clipboard, Check, Lock, AlertTriangle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clipboard, Check, Radio, Activity, AlertTriangle, Target, XCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
-// --- CONFIGURATION ---
+// --- SUPABASE CONFIG ---
 const supabaseUrl = 'https://gvglzvjsexeaectypkyk.supabase.co';
-const supabaseKey = 'sb_publishable_twPEMyojWMfPXfubNA3C3g_xqAAwPHq'; // User provided key
+const supabaseKey = 'sb_publishable_twPEMyojWMfPXfubNA3C3g_xqAAwPHq';
 
-// Create Client
 let supabase = null;
 try {
     supabase = createClient(supabaseUrl, supabaseKey);
@@ -17,164 +15,190 @@ try {
 
 // --- MOCK DATA (Fallback) ---
 const MOCK_SIGNALS = [
-    { id: 1, pair: 'EUR/USD', type: 'LONG', entry: 1.0520, tp: 1.0580, sl: 1.0490, rr: '1:2', conf: 92, status: 'ACTIVE', time: '5m ago' },
-    { id: 2, pair: 'GBP/USD', type: 'SHORT', entry: 1.2750, tp: 1.2650, sl: 1.2800, rr: '1:2', conf: 85, status: 'PROFIT', time: '2h ago' },
+    {
+        id: 1,
+        pair: 'EUR/USD',
+        action: 'BUY',
+        entry: 1.0520,
+        sl: 1.0490,
+        tp1: 1.0560,
+        tp2: 1.0600,
+        rr: '1:2.6',
+        conf: 92,
+        status: 'ENTRY_HIT',
+        currentPrice: 1.0545,
+        time: '5m ago'
+    },
+    {
+        id: 2,
+        pair: 'EUR/USD',
+        action: 'SELL',
+        entry: 1.0750,
+        sl: 1.0800,
+        tp1: 1.0700,
+        tp2: 1.0650,
+        rr: '1:2',
+        conf: 85,
+        status: 'TP1_HIT',
+        currentPrice: 1.0695,
+        time: '2h ago'
+    },
 ];
 
-const MVP_STATS = {
-    trades: 124,
-    winRate: '78%',
-    avgProfit: '+15.4%',
-    streak: '4 WINS'
+const EURUSD_LIVE = {
+    price: 1.0542,
+    trend1H: 'BULLISH',
+    trend15M: 'BULLISH',
+    aiConfidence: 87
 };
 
-function SignalRow({ s }) {
+function SignalTableRow({ signal }) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
-        const text = `SIGNAL: ${s.type} ${s.pair} @ ${s.entry}\nTP: ${s.tp}\nSL: ${s.sl}`;
+        const text = `${signal.action} ${signal.pair} @ ${signal.entry}\nSL: ${signal.sl} | TP1: ${signal.tp1} | TP2: ${signal.tp2}`;
         navigator.clipboard.writeText(text);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const getStatusBadge = (status) => {
+        const badges = {
+            'WAITING': { text: 'Waiting', color: '#999', icon: null },
+            'ENTRY_HIT': { text: 'Entry Hit', color: '#00BA88', icon: <Check size={14} /> },
+            'TP1_HIT': { text: 'TP1 Hit ✓', color: '#00BA88', icon: <Target size={14} /> },
+            'TP2_HIT': { text: 'TP2 Hit ✓✓', color: '#FFD700', icon: <Target size={14} /> },
+            'SL_HIT': { text: 'SL Hit', color: '#FF0055', icon: <XCircle size={14} /> },
+        };
+        const badge = badges[status] || badges['WAITING'];
+        return (
+            <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '4px 10px',
+                borderRadius: '12px',
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+                background: `${badge.color}20`,
+                color: badge.color,
+                border: `1px solid ${badge.color}40`
+            }}>
+                {badge.icon} {badge.text}
+            </span>
+        );
+    };
+
     return (
-        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontWeight: '700', fontSize: '1.2rem' }}>{s.pair}</span>
-                    <span style={{
-                        padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex', alignItems: 'center',
-                        background: s.status === 'ACTIVE' ? 'rgba(0,186,136,0.2)' : s.status === 'LOSS' ? 'rgba(255,0,85,0.2)' : 'rgba(255,255,255,0.1)',
-                        color: s.status === 'ACTIVE' || s.status === 'PROFIT' ? '#00BA88' : s.status === 'LOSS' ? '#FF0055' : 'white'
-                    }}>
-                        {s.status === 'ACTIVE' && <span className="animate-pulse" style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor', marginRight: '6px' }}></span>}
-                        {s.status}
-                    </span>
-                </div>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{s.time}</span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
-                <div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Action</p>
-                    <p style={{ fontWeight: 'bold', color: s.type === 'LONG' ? '#00BA88' : '#FF0055', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        {s.type === 'LONG' ? <TrendingUp size={16} /> : <TrendingDown size={16} />} {s.type}
-                    </p>
-                </div>
-                <div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Entry</p>
-                    <p style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigator.clipboard.writeText(s.entry)}>
-                        {s.entry} <Clipboard size={12} color="var(--text-muted)" />
-                    </p>
-                </div>
-                <div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Confidence</p>
-                    <p style={{ fontWeight: 'bold', color: 'gold' }}>{s.conf}%</p>
-                </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                <div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Stop Loss</p>
-                    <p style={{ color: '#FF0055', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigator.clipboard.writeText(s.sl)}>
-                        {s.sl} <Clipboard size={12} color="rgba(255,255,255,0.3)" />
-                    </p>
-                </div>
-                <div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Take Profit</p>
-                    <p style={{ color: '#00BA88', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigator.clipboard.writeText(s.tp)}>
-                        {s.tp} <Clipboard size={12} color="rgba(255,255,255,0.3)" />
-                    </p>
-                </div>
-                <div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Risk:Reward</p>
-                    <p style={{ fontWeight: 'bold' }}>{s.rr}</p>
-                </div>
-            </div>
-
-            <button onClick={handleCopy} className="btn-primary" style={{ width: '100%', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '0.6rem' }}>
-                {copied ? <Check size={18} /> : <Clipboard size={18} />}
-                {copied ? 'COPIED!' : 'COPY SIGNAL'}
-            </button>
-        </div>
+        <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <td style={{ padding: '15px 10px' }}>
+                <span style={{
+                    fontWeight: 'bold',
+                    color: signal.action === 'BUY' ? '#00BA88' : '#FF0055',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                }}>
+                    {signal.action === 'BUY' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                    {signal.action}
+                </span>
+            </td>
+            <td style={{ padding: '15px 10px', fontWeight: 'bold' }}>{signal.entry}</td>
+            <td style={{ padding: '15px 10px', color: '#FF0055' }}>{signal.sl}</td>
+            <td style={{ padding: '15px 10px', color: '#00BA88' }}>{signal.tp1}</td>
+            <td style={{ padding: '15px 10px', color: '#FFD700' }}>{signal.tp2}</td>
+            <td style={{ padding: '15px 10px', fontFamily: 'monospace' }}>{signal.rr}</td>
+            <td style={{ padding: '15px 10px' }}>{getStatusBadge(signal.status)}</td>
+            <td style={{ padding: '15px 10px' }}>
+                <button
+                    onClick={handleCopy}
+                    style={{
+                        background: 'rgba(0,186,136,0.2)',
+                        border: '1px solid #00BA88',
+                        color: '#00BA88',
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        fontSize: '0.85rem',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    {copied ? <Check size={14} /> : <Clipboard size={14} />}
+                    {copied ? 'Copied' : 'Copy'}
+                </button>
+            </td>
+        </tr>
     );
 }
 
-function StatsCard({ label, value, sub }) {
-    return (
-        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '12px', textAlign: 'center' }}>
-            <h3 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{value}</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{label}</p>
-            {sub && <p style={{ color: '#00BA88', fontSize: '0.8rem', marginTop: '0.5rem' }}>{sub}</p>}
-        </div>
-    )
-}
-
 export default function AppMVP() {
-    const [chartData, setChartData] = useState([]);
     const [signals, setSignals] = useState(MOCK_SIGNALS);
+    const [liveData, setLiveData] = useState(EURUSD_LIVE);
 
     // FETCH REAL DATA
     useEffect(() => {
         if (!supabase) return;
 
-        console.log("🔌 Connected to Supabase, fetching signals...");
+        console.log("🔌 Connected to Supabase, fetching EUR/USD signals...");
 
         const fetchSignals = async () => {
             const { data, error } = await supabase
                 .from('ai_signals')
                 .select('*')
+                .eq('symbol', 'EURUSD=X')
                 .order('created_at', { ascending: false })
-                .limit(10); // Get latest 10
+                .limit(10);
 
             if (data && !error && data.length > 0) {
-                console.log("✅ Got Signals:", data.length);
+                console.log("✅ Got EUR/USD Signals:", data.length);
                 const realSignals = data.map(d => ({
                     id: d.id,
-                    pair: d.symbol,
-                    type: d.signal_type || 'WATCH',
+                    pair: 'EUR/USD',
+                    action: d.signal_type === 'LONG' ? 'BUY' : 'SELL',
                     entry: parseFloat(d.predicted_close || 0).toFixed(4),
-                    // Mock SL/TP calculation if not in DB, assuming Long logic for demo
-                    // In production scanner, SL/TP should be saved in DB
-                    tp: (d.predicted_close * (d.signal_type === 'SHORT' ? 0.99 : 1.01)).toFixed(4),
-                    sl: (d.predicted_close * (d.signal_type === 'SHORT' ? 1.005 : 0.995)).toFixed(4),
-                    rr: '1:2',
+                    sl: (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(4),
+                    tp1: (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)).toFixed(4),
+                    tp2: (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)).toFixed(4),
+                    rr: '1:2.6',
                     conf: d.confidence_score,
-                    status: 'ACTIVE', // Default to active for new signals
+                    status: 'WAITING',
+                    currentPrice: d.predicted_close,
                     time: new Date(d.created_at).toLocaleTimeString()
                 }));
                 setSignals(realSignals);
-            } else {
-                console.log("⚠️ No signals found in DB or Error:", error);
             }
         };
 
         fetchSignals();
 
-        // Subscription would go here if Realtime is enabled on Table
         const channel = supabase
-            .channel('table-db-changes')
+            .channel('eurusd-signals')
             .on(
                 'postgres_changes',
                 {
                     event: 'INSERT',
                     schema: 'public',
                     table: 'ai_signals',
+                    filter: 'symbol=eq.EURUSD=X'
                 },
                 (payload) => {
-                    console.log("🔔 Realtime Update:", payload);
+                    console.log("🔔 New EUR/USD Signal:", payload);
                     const d = payload.new;
                     const newSignal = {
                         id: d.id,
-                        pair: d.symbol,
-                        type: d.signal_type || 'WATCH',
+                        pair: 'EUR/USD',
+                        action: d.signal_type === 'LONG' ? 'BUY' : 'SELL',
                         entry: parseFloat(d.predicted_close || 0).toFixed(4),
-                        tp: (d.predicted_close * (d.signal_type === 'SHORT' ? 0.99 : 1.01)).toFixed(4),
-                        sl: (d.predicted_close * (d.signal_type === 'SHORT' ? 1.005 : 0.995)).toFixed(4),
-                        rr: '1:2',
+                        sl: (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(4),
+                        tp1: (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)).toFixed(4),
+                        tp2: (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)).toFixed(4),
+                        rr: '1:2.6',
                         conf: d.confidence_score,
-                        status: 'JUST IN',
+                        status: 'WAITING',
+                        currentPrice: d.predicted_close,
                         time: 'Now'
                     };
                     setSignals(prev => [newSignal, ...prev]);
@@ -186,91 +210,85 @@ export default function AppMVP() {
 
     }, []);
 
-    useEffect(() => {
-        // Mock chart
-        const data = [];
-        let price = 1.0500;
-        for (let i = 0; i < 20; i++) {
-            price = price + (Math.random() - 0.5) * 0.0050;
-            data.push({ time: i, price });
-        }
-        setChartData(data);
-    }, []);
-
     return (
-        <div style={{ fontFamily: "'Outfit', sans-serif" }}>
+        <div style={{ fontFamily: "'Outfit', sans-serif", minHeight: '100vh', background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)' }}>
             {/* HEADER */}
-            <nav className="glass-panel" style={{ padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderRight: 'none' }}>
+            <nav className="glass-panel" style={{ padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, borderRadius: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <Activity color="var(--primary)" size={24} />
-                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>AI Forecast <span className="text-secondary" style={{ fontSize: '0.8rem', border: '1px solid var(--secondary)', padding: '2px 6px', borderRadius: '4px' }}>MVP</span></span>
+                    <Activity color="#00F0FF" size={24} />
+                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'white' }}>AI Forecast <span style={{ fontSize: '0.8rem', border: '1px solid #FFD700', padding: '2px 6px', borderRadius: '4px', color: '#FFD700' }}>FOREX</span></span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#00BA88' }}>
                     <Radio size={16} className="animate-pulse" /> LIVE MONITORING
                 </div>
             </nav>
 
-            <main className="container" style={{ padding: '2rem 1rem' }}>
+            <main className="container" style={{ padding: '2rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
 
-                {/* HERO */}
-                <section style={{ textAlign: 'center', marginBottom: '3rem', paddingTop: '2rem' }}>
-                    <h1 style={{ fontSize: '2.5rem', lineHeight: '1.2', marginBottom: '1rem' }}>
-                        EUR/USD Live AI Signals <br /> <span className="text-gradient">MVP Edition</span>
-                    </h1>
-                    <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto' }}>
-                        Real-time AI monitoring with automated SL/TP tracking for Forex Traders.
-                        <br />
-                        <span style={{ fontSize: '0.9rem', color: 'orange', display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '1rem' }}>
-                            <Lock size={12} /> Private Access for Beta Testing
-                        </span>
-                    </p>
+                {/* EUR/USD LIVE CARD */}
+                <section className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', background: 'linear-gradient(135deg, rgba(0,240,255,0.05) 0%, rgba(0,186,136,0.05) 100%)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '20px', alignItems: 'center' }}>
+                        <div>
+                            <h1 style={{ fontSize: '3rem', fontWeight: 'bold', color: 'white', marginBottom: '5px' }}>EUR/USD</h1>
+                            <p style={{ fontSize: '2.5rem', color: '#00F0FF', fontWeight: 'bold', fontFamily: 'monospace' }}>{liveData.price}</p>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <p style={{ fontSize: '0.85rem', color: '#999', marginBottom: '5px' }}>1H Trend</p>
+                            <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: liveData.trend1H === 'BULLISH' ? '#00BA88' : '#FF0055' }}>
+                                {liveData.trend1H === 'BULLISH' ? '↗ BULLISH' : '↘ BEARISH'}
+                            </p>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <p style={{ fontSize: '0.85rem', color: '#999', marginBottom: '5px' }}>15M Trend</p>
+                            <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: liveData.trend15M === 'BULLISH' ? '#00BA88' : '#FF0055' }}>
+                                {liveData.trend15M === 'BULLISH' ? '↗ BULLISH' : '↘ BEARISH'}
+                            </p>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                            <p style={{ fontSize: '0.85rem', color: '#999', marginBottom: '5px' }}>AI Confidence</p>
+                            <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#FFD700' }}>{liveData.aiConfidence}%</p>
+                        </div>
+                    </div>
                 </section>
 
-                {/* STATS */}
-                <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', marginBottom: '3rem' }}>
-                    <StatsCard label="Total Trades (7D)" value={MVP_STATS.trades} />
-                    <StatsCard label="Win Rate" value={MVP_STATS.winRate} sub={MVP_STATS.streak} />
-                    <StatsCard label="Avg. Profit" value={MVP_STATS.avgProfit} />
-                </section>
-
-                {/* CHART */}
-                <section className="glass-panel" style={{ padding: '1.5rem', marginBottom: '3rem', height: '300px' }}>
-                    <h3 style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Live Market Trend (1H)</span>
-                        <span style={{ color: 'var(--primary)' }}>EUR/USD: 1.0542</span>
-                    </h3>
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={chartData}>
-                            <defs>
-                                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#00F0FF" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#00F0FF" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <Tooltip contentStyle={{ backgroundColor: '#030014', border: 'none' }} />
-                            <Area type="monotone" dataKey="price" stroke="#00F0FF" fillOpacity={1} fill="url(#colorPrice)" />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </section>
-
-                {/* SIGNALS LIST */}
+                {/* SIGNAL TABLE */}
                 <section>
-                    <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem' }}>Active AI Signals</h2>
-                    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                        {signals.map(s => (
-                            <SignalRow key={s.id} s={s} />
-                        ))}
+                    <h2 style={{ fontSize: '1.8rem', marginBottom: '1.5rem', color: 'white', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <Target color="#00F0FF" size={28} />
+                        Active Trading Signals
+                    </h2>
+
+                    <div className="glass-panel" style={{ padding: '0', overflow: 'hidden' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ background: 'rgba(0,240,255,0.1)', borderBottom: '2px solid rgba(0,240,255,0.3)' }}>
+                                    <th style={{ padding: '15px 10px', textAlign: 'left', color: '#00F0FF', fontSize: '0.9rem', fontWeight: 'bold' }}>ACTION</th>
+                                    <th style={{ padding: '15px 10px', textAlign: 'left', color: '#00F0FF', fontSize: '0.9rem', fontWeight: 'bold' }}>ENTRY</th>
+                                    <th style={{ padding: '15px 10px', textAlign: 'left', color: '#00F0FF', fontSize: '0.9rem', fontWeight: 'bold' }}>SL</th>
+                                    <th style={{ padding: '15px 10px', textAlign: 'left', color: '#00F0FF', fontSize: '0.9rem', fontWeight: 'bold' }}>TP1</th>
+                                    <th style={{ padding: '15px 10px', textAlign: 'left', color: '#00F0FF', fontSize: '0.9rem', fontWeight: 'bold' }}>TP2</th>
+                                    <th style={{ padding: '15px 10px', textAlign: 'left', color: '#00F0FF', fontSize: '0.9rem', fontWeight: 'bold' }}>R:R</th>
+                                    <th style={{ padding: '15px 10px', textAlign: 'left', color: '#00F0FF', fontSize: '0.9rem', fontWeight: 'bold' }}>STATUS</th>
+                                    <th style={{ padding: '15px 10px', textAlign: 'left', color: '#00F0FF', fontSize: '0.9rem', fontWeight: 'bold' }}>COPY</th>
+                                </tr>
+                            </thead>
+                            <tbody style={{ color: 'white' }}>
+                                {signals.map(s => (
+                                    <SignalTableRow key={s.id} signal={s} />
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </section>
 
                 {/* FOOTER */}
                 <footer style={{ marginTop: '4rem', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem' }}>
-                    <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                    <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#999', fontSize: '0.8rem' }}>
                         <AlertTriangle size={16} color="orange" />
                         Educational purposes only. Past performance does not guarantee future results.
                     </p>
                     <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginTop: '0.5rem' }}>
-                        &copy; 2024 AI Smart Forecast. UK/Global Edition.
+                        &copy; 2024 AI Smart Forecast. Forex Edition for Professional Traders.
                     </p>
                 </footer>
 
