@@ -31,10 +31,31 @@ function InvestmentThesis() {
 
     const [submitted, setSubmitted] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitted(true);
-        setTimeout(() => setSubmitted(false), 3000);
+
+        try {
+            await fetch("https://formsubmit.co/ajax/vuquangcuong@gmail.com", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    company: formData.company,
+                    type: formData.type,
+                    message: formData.message,
+                    _subject: "New Investment Lead - Quantix AI Forecast"
+                })
+            });
+            setSubmitted(true);
+            setTimeout(() => setSubmitted(false), 5000);
+        } catch (error) {
+            console.error("Form submission error:", error);
+            alert("There was an error sending your message. Please try again.");
+        }
     };
 
     return (
@@ -82,9 +103,9 @@ function InvestmentThesis() {
                 </p>
 
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                    <a href="#contact" className="btn-primary" style={{ textDecoration: 'none', background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', color: '#000' }}>
+                    <button className="btn-primary" title="Coming Soon" style={{ textDecoration: 'none', background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', color: '#000', cursor: 'not-allowed', opacity: 0.9 }}>
                         Request Pitch Deck
-                    </a>
+                    </button>
                     <a href="#roadmap" style={{
                         textDecoration: 'none',
                         padding: '0.75rem 2rem',
@@ -113,7 +134,7 @@ function InvestmentThesis() {
                         Executive Summary
                     </h2>
                     <p style={{ fontSize: '1.2rem', lineHeight: 1.8, color: 'rgba(255,255,255,0.9)' }}>
-                        "Quantix AI Core v1.5 không chỉ là một công cụ dự báo. Đó là một <strong style={{ color: '#FFD700' }}>giải pháp hạ tầng</strong> giúp giải quyết bài toán khó nhất của Fintech: <strong style={{ color: '#FFD700' }}>Cá nhân hóa ở quy mô lớn</strong> với chi phí vận hành thấp. Chúng tôi mời gọi các đối tác cùng đồng hành để chiếm lĩnh thị trường trợ lý đầu tư AI đang còn bỏ ngỏ."
+                        "Quantix AI Core v1.5 is more than a prediction tool. It is an <strong style={{ color: '#FFD700' }}>infrastructure solution</strong> that solves the hardest Fintech problem: <strong style={{ color: '#FFD700' }}>Mass Personalization at Scale</strong> while maintaining low operational costs. We invite strategic partners to join us in capturing the untapped AI investment advisory market."
                     </p>
                 </div>
             </section>
@@ -129,7 +150,7 @@ function InvestmentThesis() {
                         <Zap size={40} color="#00F0FF" style={{ marginBottom: '1rem' }} />
                         <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Mass Personalization</h3>
                         <p style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                            "Chúng tôi không cung cấp một tín hiệu cho tất cả. Chúng tôi cung cấp <strong style={{ color: '#00F0FF' }}>hàng nghìn tín hiệu cá nhân hóa</strong> cho hàng nghìn danh mục khác nhau thông qua Quantix AI Core v1.5."
+                            "We don't provide one signal for everyone. We provide <strong style={{ color: '#00F0FF' }}>thousands of personalized signals</strong> for thousands of different portfolios through Quantix AI Core v1.5."
                         </p>
                     </div>
 
@@ -137,7 +158,7 @@ function InvestmentThesis() {
                         <DollarSign size={40} color="#00BA88" style={{ marginBottom: '1rem' }} />
                         <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Infrastructure Efficiency</h3>
                         <p style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                            Giảm <strong style={{ color: '#00BA88' }}>70% chi phí API</strong> nhờ công nghệ Semantic Caching độc quyền. Điều này tạo ra biên lợi nhuận vượt trội so với các đối thủ cạnh tranh.
+                            Reduce <strong style={{ color: '#00BA88' }}>LLM API costs by 70%</strong> thanks to our proprietary Semantic Caching technology. This creates superior profit margins compared to competitors.
                         </p>
                         <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(0,186,136,0.1)', borderRadius: '8px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
@@ -164,7 +185,7 @@ function InvestmentThesis() {
                         <Building2 size={36} color="#FFD700" style={{ marginBottom: '1rem' }} />
                         <h3 style={{ fontSize: '1.3rem', marginBottom: '1rem', color: '#FFD700' }}>Strategic Investor</h3>
                         <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.6 }}>
-                            Tập trung vào việc rót vốn để hoàn thiện v2.0 và mở rộng hạ tầng.
+                            Focusing on capital injection to complete v2.0 and expand infrastructure.
                         </p>
                         <ul style={{ listStyle: 'none', padding: 0 }}>
                             {['Equity stake', 'Board seat (optional)', 'Strategic guidance', 'Network access'].map((item, i) => (
@@ -180,7 +201,7 @@ function InvestmentThesis() {
                         <Users size={36} color="#00F0FF" style={{ marginBottom: '1rem' }} />
                         <h3 style={{ fontSize: '1.3rem', marginBottom: '1rem', color: '#00F0FF' }}>Affiliate Partners</h3>
                         <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.6 }}>
-                            Dành cho KOLs, Broker chứng khoán. Nhận hoa hồng từ phí Subscription.
+                            For KOLs and Stock Brokers. Earn commissions from subscription fees.
                         </p>
                         <ul style={{ listStyle: 'none', padding: 0 }}>
                             {['20-30% recurring commission', 'White-label options', 'Marketing support', 'Dedicated dashboard'].map((item, i) => (
@@ -196,7 +217,7 @@ function InvestmentThesis() {
                         <Briefcase size={36} color="#00BA88" style={{ marginBottom: '1rem' }} />
                         <h3 style={{ fontSize: '1.3rem', marginBottom: '1rem', color: '#00BA88' }}>Institutional API</h3>
                         <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.6 }}>
-                            Cung cấp lõi Quantix cho các quỹ hoặc công ty chứng khoán.
+                            Providing the Quantix core to funds or brokerage firms.
                         </p>
                         <ul style={{ listStyle: 'none', padding: 0 }}>
                             {['Custom pricing', 'Dedicated infrastructure', 'SLA guarantee', 'Priority support'].map((item, i) => (
@@ -220,13 +241,13 @@ function InvestmentThesis() {
                     <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', borderBottom: '3px solid #00F0FF' }}>
                         <h3 style={{ fontSize: '3rem', color: '#00F0FF', marginBottom: '0.5rem' }}>5M</h3>
                         <p style={{ color: 'var(--text-muted)' }}>Target Market Size</p>
-                        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>Tài khoản chứng khoán tại VN</p>
+                        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>Stock accounts in Vietnam</p>
                     </div>
 
                     <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', borderBottom: '3px solid #FFD700' }}>
                         <h3 style={{ fontSize: '3rem', color: '#FFD700', marginBottom: '0.5rem' }}>2-5%</h3>
                         <p style={{ color: 'var(--text-muted)' }}>Conversion Goal</p>
-                        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>User chuyển sang Premium</p>
+                        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>Users converting to Premium</p>
                     </div>
 
                     <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', borderBottom: '3px solid #00BA88' }}>
@@ -288,19 +309,19 @@ function InvestmentThesis() {
                         {
                             quarter: 'Q1/2026',
                             title: 'Platform Foundation',
-                            items: ['Hoàn thiện v1.5', 'Hệ thống thanh toán tự động', 'Beta testing với 1,000 users'],
+                            items: ['Complete v1.5 infrastructure', 'Automated billing system', 'Beta testing with 1,000 users'],
                             color: '#00F0FF'
                         },
                         {
                             quarter: 'Q2/2026',
                             title: 'Market Expansion',
-                            items: ['Chiến dịch Mass-Personalization', 'Tiếp cận 50,000 User', 'Mở rộng đội ngũ'],
+                            items: ['Mass-Personalization campaign', 'Reach 50,000 active users', 'Scale core development team'],
                             color: '#FFD700'
                         },
                         {
                             quarter: 'Q3/2026',
                             title: 'Feature Diversification',
-                            items: ['Dự báo đa tài sản (Forex, Crypto)', 'API cho đối tác B2B', 'Mobile app launch'],
+                            items: ['Multi-asset forecasting (Forex, Crypto)', 'B2B Partner API', 'Full mobile app launch'],
                             color: '#00BA88'
                         }
                     ].map((phase, i) => (
@@ -467,8 +488,8 @@ function InvestmentThesis() {
                             </button>
 
                             <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                                <a
-                                    href="#"
+                                <button
+                                    title="Coming Soon"
                                     onClick={(e) => { e.preventDefault(); alert('Pitch deck download link will be sent to your email after verification.'); }}
                                     style={{
                                         color: '#FFD700',
@@ -476,12 +497,17 @@ function InvestmentThesis() {
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '8px',
-                                        fontWeight: '500'
+                                        fontWeight: '500',
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'not-allowed',
+                                        fontFamily: 'inherit',
+                                        fontSize: '1rem'
                                     }}
                                 >
                                     <FileText size={18} />
                                     Download One-Pager PDF
-                                </a>
+                                </button>
                             </div>
                         </form>
                     )}

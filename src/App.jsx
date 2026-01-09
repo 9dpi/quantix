@@ -65,68 +65,6 @@ const TRANSLATIONS = {
       t3: { name: 'Michael Tran', role: 'Crypto Investor', content: 'The dark mode UI is beautiful, but the AI algorithms are the real deal. High win rate on VN30.' }
     }
   },
-  vi: {
-    nav: { features: 'Tính năng', signals: 'Tín hiệu Live', pricing: 'Bảng giá', login: 'Đăng nhập', logout: 'Đăng xuất', vn30: 'VN30 App' },
-    hero: {
-      badge: '✨ Quantix AI Core v1.5',
-      title1: 'Dự báo Tương lai',
-      title2: 'Xu hướng Thị trường',
-      desc: 'Hệ thống dự báo chứng khoán tự động hóa 100%. Sử dụng thuật toán AI tiên tiến để phân tích biến động và đưa ra tín hiệu chính xác.',
-      ctaPrimary: 'Dùng thử miễn phí',
-      ctaSecondary: 'Xem Demo',
-      stats: { accuracy: 'Độ chính xác', watch: 'Giám sát 24/7', fees: 'Phí ẩn' }
-    },
-    features: {
-      title: 'Tại sao chọn',
-      subtitle: 'Công nghệ tối tân dành cho nhà đầu tư hiện đại.',
-      f1: { title: 'Khớp lệnh Thời gian thực', desc: 'Thuật toán xử lý dữ liệu thị trường trong mili-giây, đảm bảo bạn không bao giờ lỡ nhịp.' },
-      f2: { title: 'Bảo mật Cấp Ngân hàng', desc: 'Dữ liệu và tài sản được bảo vệ bởi mã hóa cấp doanh nghiệp và công nghệ chống thu thập dữ liệu.' },
-      f3: { title: 'Thị trường Toàn cầu', desc: 'Mở rộng danh mục đầu tư qua NYSE, NASDAQ và Crypto trên một dashboard duy nhất.' }
-    },
-    pricing: {
-      title: 'Bảng giá Linh hoạt',
-      subtitle: 'Chọn gói phù hợp với phong cách giao dịch của bạn.',
-      starter: { title: 'Khởi động', price: '0₫', period: '/mãi mãi', desc: 'Dành cho người mới bắt đầu tìm hiểu AI.' },
-      pro: { title: 'Chuyên nghiệp', price: '999k', period: '/tháng', desc: 'Tín hiệu nâng cao và dữ liệu real-time.' },
-      inst: { title: 'Tổ chức', price: 'Liên hệ', period: '', desc: 'API riêng và hỗ trợ kỹ thuật 24/7.' },
-      features: {
-        signals: 'Tín hiệu Hàng ngày',
-        delay: 'Dữ liệu Thời gian thực',
-        mkts: 'Thị trường hỗ trợ',
-        supp: 'Hỗ trợ'
-      },
-      btn: { start: 'Bắt đầu ngay', buy: 'Nâng cấp ngay', contact: 'Liên hệ Sale' }
-    },
-    dashboard: {
-      welcome: 'Chào mừng trở lại',
-      status: 'Hệ thống đã tối ưu',
-      conn: 'Đã kết nối Yahoo Finance Realtime API',
-      tabs: { overview: 'Tổng quan', signals: 'Tín hiệu Active', settings: 'Cài đặt' }
-    },
-    signals: {
-      lockedTitle: 'Dành riêng cho Thành viên',
-      lockedDesc: 'Tín hiệu thời gian thực và phân tích nâng cao được bảo vệ. Hãy đăng nhập để mở khóa sức mạnh của AI Smart Forecast.',
-      btnUnlock: 'Đăng nhập để Mở khóa',
-      liveTitle: 'Tín hiệu Giao dịch - VN30',
-      vol: 'KL',
-      target: 'Mục tiêu',
-      viewFull: 'Xem Dashboard VN30'
-    },
-    login: {
-      title: 'Chào mừng trở lại',
-      email: 'Địa chỉ Email',
-      pass: 'Mật khẩu',
-      btn: 'Truy cập Dashboard',
-      footer: 'Chưa có tài khoản? Đăng ký chờ'
-    },
-    testimonials: {
-      title: 'Nhà đầu tư tin dùng',
-      subtitle: 'Cộng đồng nói gì về Quantix AI Forecast.',
-      t1: { name: 'Alex Nguyễn', role: 'Day Trader', content: 'Độ chính xác thực sự đáng sợ. Tôi đã thu hồi vốn phí đăng ký ngay trong lệnh đầu tiên.' },
-      t2: { name: 'Sarah Lê', role: 'Nhân viên VP', content: 'Tôi không có thời gian canh bảng. Tín hiệu tự động giúp tôi giao dịch ngay cả khi đang làm việc. Quá đỉnh.' },
-      t3: { name: 'Michael Trần', role: 'Nhà đầu tư Crypto', content: 'Giao diện Dark mode rất đẹp, nhưng thuật toán AI mới là thứ đáng tiền. Tỷ lệ thắng cao trên VN30.' }
-    }
-  }
 };
 
 function useSecurity() {
@@ -150,7 +88,7 @@ function useSecurity() {
   }, []);
 }
 
-function Navbar({ lang, setLang, t, onLoginClick, isLoggedIn, onLogout }) {
+function Navbar({ t, onLoginClick, isLoggedIn, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -165,13 +103,6 @@ function Navbar({ lang, setLang, t, onLoginClick, isLoggedIn, onLogout }) {
 
         {/* Desktop Menu */}
         <div className="nav-links-desktop">
-          <button
-            onClick={() => setLang(lang === 'en' ? 'vi' : 'en')}
-            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.9rem' }}
-          >
-            <Globe size={16} /> {lang.toUpperCase()}
-          </button>
-
           {!isLoggedIn && (
             <>
               <a href="#features" className="nav-link">{t.nav.features}</a>
@@ -212,13 +143,6 @@ function Navbar({ lang, setLang, t, onLoginClick, isLoggedIn, onLogout }) {
           position: 'fixed', inset: '80px 0 0 0', background: 'rgba(3,0,20,0.95)', backdropFilter: 'blur(10px)',
           zIndex: 99, padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center'
         }}>
-          <button
-            onClick={() => { setLang(lang === 'en' ? 'vi' : 'en'); setMobileMenuOpen(false); }}
-            style={{ background: 'transparent', border: '1px solid var(--text-muted)', color: 'white', padding: '0.5rem 2rem', borderRadius: '50px' }}
-          >
-            Switch Language: {lang.toUpperCase()}
-          </button>
-
           {!isLoggedIn && (
             <>
               <a href="#features" className="nav-link" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: '1.2rem' }}>{t.nav.features}</a>
@@ -312,16 +236,20 @@ function PricingCard({ title, price, period, desc, features, t, highlighted = fa
         ))}
       </div>
 
-      <button className={highlighted ? 'btn-primary' : ''} style={{
-        width: '100%',
-        padding: '0.75rem',
-        borderRadius: '8px',
-        border: highlighted ? 'none' : '1px solid rgba(255,255,255,0.2)',
-        background: highlighted ? undefined : 'transparent',
-        color: 'white',
-        cursor: 'pointer',
-        fontWeight: '600'
-      }}>
+      <button
+        className={highlighted ? 'btn-primary' : ''}
+        title="Coming Soon"
+        style={{
+          width: '100%',
+          padding: '0.75rem',
+          borderRadius: '8px',
+          border: highlighted ? 'none' : '1px solid rgba(255,255,255,0.2)',
+          background: highlighted ? undefined : 'transparent',
+          color: 'white',
+          cursor: 'not-allowed',
+          fontWeight: '600',
+          opacity: 0.7
+        }}>
         {highlighted ? t.btn.buy : t.btn.start}
       </button>
     </div>
@@ -604,10 +532,10 @@ function Hero({ t }) {
         </p>
 
         <div className="hero-cta-row">
-          <button className="btn-primary">
+          <button className="btn-primary" title="Coming Soon" style={{ cursor: 'not-allowed', opacity: 0.8 }}>
             {t.hero.ctaPrimary}
           </button>
-          <button style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '0.75rem 2rem', borderRadius: '99px', cursor: 'pointer', fontWeight: '500' }}>
+          <button title="Coming Soon" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '0.75rem 2rem', borderRadius: '99px', cursor: 'not-allowed', fontWeight: '500', opacity: 0.8 }}>
             {t.hero.ctaSecondary} <ChevronRight size={16} style={{ display: 'inline', verticalAlign: 'middle' }} />
           </button>
         </div>
@@ -727,21 +655,18 @@ function TestimonialsSection({ t }) {
 
 function App() {
   useSecurity();
-  const [lang, setLang] = useState('en');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     document.title = "Quantix AI Forecast";
   }, []);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const t = TRANSLATIONS[lang];
+  const t = TRANSLATIONS.en;
 
   return (
-    <div>
+    <div style={{ fontFamily: "'Outfit', sans-serif" }}>
       <Navbar
-        lang={lang}
-        setLang={setLang}
         t={t}
         isLoggedIn={isLoggedIn}
         onLoginClick={() => setShowLoginModal(true)}
