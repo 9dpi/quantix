@@ -98,13 +98,15 @@ async function sendTelegramAlert(message) {
 async function updateSignalStatus(signalId, newStatus, currentPrice) {
     const client = await pool.connect();
     try {
-        // Lưu trạng thái vào một cột metadata (JSON) hoặc tạo bảng riêng
-        // Tạm thời update vào model_version để demo
         await client.query(
-            `UPDATE ai_signals SET model_version = $1 WHERE id = $2`,
-            [newStatus, signalId]
+            `UPDATE ai_signals 
+             SET signal_status = $1, 
+                 current_price = $2, 
+                 last_checked_at = NOW() 
+             WHERE id = $3`,
+            [newStatus, currentPrice, signalId]
         );
-        console.log(`✅ Updated Signal ${signalId} → ${newStatus}`);
+        console.log(`✅ Updated Signal ${signalId} → ${newStatus} (Price: ${currentPrice})`);
     } catch (error) {
         console.error("❌ DB Update Error:", error.message);
     } finally {
@@ -121,11 +123,13 @@ async function watchSignals() {
     try {
         // Lấy tất cả signals đang ACTIVE (chưa hit SL hoặc TP2)
         const result = await client.query(`
-            SELECT id, symbol, signal_type, predicted_close, confidence_score, model_version, created_at
+            SELECT id, symbol, signal_type, predicted_close, confidence_score, 
+                   signal_status, entry_price, sl_price, tp1_price, tp2_price, 
+                   current_price, created_at
             FROM ai_signals
             WHERE symbol = 'EURUSD=X'
             AND is_published = TRUE
-            AND (model_version IS NULL OR model_version NOT IN ('SL_HIT', 'TP2_HIT'))
+            AND (signal_status IS NULL OR signal_status NOT IN ('SL_HIT', 'TP2_HIT'))
             ORDER BY created_at DESC
             LIMIT 10
         `);
@@ -149,7 +153,7 @@ async function watchSignals() {
         for (const signal of signals) {
             const entry = parseFloat(signal.predicted_close);
             const signalType = signal.signal_type; // 'LONG' or 'SHORT'
-            const currentStatus = signal.model_version || 'WAITING';
+            const currentStatus = signal.signal_status || 'WAITING';
 
             // Tính SL & TP (giống logic Frontend)
             const sl = signalType === 'LONG' ? entry * 0.997 : entry * 1.003;

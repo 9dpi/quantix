@@ -159,13 +159,13 @@ export default function AppMVP() {
                     pair: 'EUR/USD',
                     action: d.signal_type === 'LONG' ? 'BUY' : 'SELL',
                     entry: parseFloat(d.predicted_close || 0).toFixed(4),
-                    sl: (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(4),
-                    tp1: (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)).toFixed(4),
-                    tp2: (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)).toFixed(4),
+                    sl: d.sl_price ? parseFloat(d.sl_price).toFixed(4) : (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(4),
+                    tp1: d.tp1_price ? parseFloat(d.tp1_price).toFixed(4) : (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)).toFixed(4),
+                    tp2: d.tp2_price ? parseFloat(d.tp2_price).toFixed(4) : (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)).toFixed(4),
                     rr: '1:2.6',
                     conf: d.confidence_score,
-                    status: 'WAITING',
-                    currentPrice: d.predicted_close,
+                    status: d.signal_status || 'WAITING',
+                    currentPrice: d.current_price || d.predicted_close,
                     time: new Date(d.created_at).toLocaleTimeString()
                 }));
                 setSignals(realSignals);
@@ -192,13 +192,13 @@ export default function AppMVP() {
                         pair: 'EUR/USD',
                         action: d.signal_type === 'LONG' ? 'BUY' : 'SELL',
                         entry: parseFloat(d.predicted_close || 0).toFixed(4),
-                        sl: (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(4),
-                        tp1: (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)).toFixed(4),
-                        tp2: (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)).toFixed(4),
+                        sl: d.sl_price ? parseFloat(d.sl_price).toFixed(4) : (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(4),
+                        tp1: d.tp1_price ? parseFloat(d.tp1_price).toFixed(4) : (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)).toFixed(4),
+                        tp2: d.tp2_price ? parseFloat(d.tp2_price).toFixed(4) : (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)).toFixed(4),
                         rr: '1:2.6',
                         conf: d.confidence_score,
-                        status: 'WAITING',
-                        currentPrice: d.predicted_close,
+                        status: d.signal_status || 'WAITING',
+                        currentPrice: d.current_price || d.predicted_close,
                         time: 'Now'
                     };
                     setSignals(prev => [newSignal, ...prev]);
