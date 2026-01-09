@@ -21,39 +21,40 @@ const pool = new Pool({
 const bot = process.env.TELEGRAM_TOKEN ? new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: false }) : null;
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-// --- OANDA API CONFIG ---
-const OANDA_API_KEY = process.env.OANDA_API_KEY || '';
-const OANDA_ACCOUNT_ID = process.env.OANDA_ACCOUNT_ID || '';
-const OANDA_BASE_URL = 'https://api-fxpractice.oanda.com'; // Practice account
+// --- ALPHA VANTAGE API CONFIG ---
+const ALPHA_VANTAGE_KEY = process.env.ALPHA_VANTAGE_KEY || 'Z9JGV0STF4PE6C61';
 
 /**
- * Lấy giá EUR/USD từ OANDA (Synced with TradingView)
+ * Lấy giá EUR/USD từ Alpha Vantage (Real-time Forex)
  */
-async function getOANDAPrice() {
+async function getAlphaVantagePrice() {
     try {
-        if (!OANDA_API_KEY) {
-            console.warn("⚠️ OANDA API Key not configured, using Yahoo Finance fallback");
+        if (!ALPHA_VANTAGE_KEY) {
+            console.warn("⚠️ Alpha Vantage API Key not configured, using Yahoo Finance fallback");
             return await getYahooPrice();
         }
 
-        const response = await fetch(`${OANDA_BASE_URL}/v3/accounts/${OANDA_ACCOUNT_ID}/pricing?instruments=EUR_USD`, {
-            headers: {
-                'Authorization': `Bearer ${OANDA_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
+        const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=EUR&to_currency=USD&apikey=${ALPHA_VANTAGE_KEY}`;
+        const response = await fetch(url);
 
         if (!response.ok) {
-            throw new Error(`OANDA API Error: ${response.status}`);
+            throw new Error(`Alpha Vantage API Error: ${response.status}`);
         }
 
         const data = await response.json();
-        const price = parseFloat(data.prices[0].closeoutBid);
-        console.log(`📊 OANDA EUR/USD: ${price}`);
+
+        // Check for rate limit or error
+        if (data.Note || data['Error Message']) {
+            console.warn("⚠️ Alpha Vantage rate limit or error, using fallback");
+            return await getYahooPrice();
+        }
+
+        const price = parseFloat(data['Realtime Currency Exchange Rate']['5. Exchange Rate']);
+        console.log(`📊 Alpha Vantage EUR/USD: ${price}`);
         return price;
 
     } catch (error) {
-        console.error("❌ OANDA Fetch Error:", error.message);
+        console.error("❌ Alpha Vantage Fetch Error:", error.message);
         return await getYahooPrice(); // Fallback
     }
 }
@@ -66,7 +67,7 @@ async function getYahooPrice() {
         const response = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/EURUSD=X?interval=1m&range=1d');
         const data = await response.json();
         const price = data.chart.result[0].meta.regularMarketPrice;
-        console.log(`📊 Yahoo EUR/USD: ${price}`);
+        console.log(`📊 Yahoo EUR/USD (Fallback): ${price}`);
         return price;
     } catch (error) {
         console.error("❌ Yahoo Fetch Error:", error.message);
@@ -136,8 +137,8 @@ async function watchSignals() {
             return;
         }
 
-        // Lấy giá hiện tại
-        const currentPrice = await getOANDAPrice();
+        // Lấy giá hiện tại từ Alpha Vantage
+        const currentPrice = await getAlphaVantagePrice();
         if (!currentPrice) {
             console.error("❌ Cannot fetch current price, skipping this cycle.");
             return;
@@ -217,7 +218,8 @@ async function watchSignals() {
  */
 async function startWatchdog() {
     console.log("🚀 Starting Price Watchdog for EUR/USD...");
-    console.log("   Data Source: OANDA (Synced with TradingView)");
+    console.log("   Data Source: Alpha Vantage (Real-time Forex)");
+    console.log("   Fallback: Yahoo Finance");
     console.log("   Check Interval: Every 10 seconds");
     console.log("-----------------------------------\n");
 
