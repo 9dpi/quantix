@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Clipboard, Check, Radio, Activity, AlertTriangle, Target, XCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clipboard, Check, Radio, Activity, AlertTriangle, Target, XCircle, CheckCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
 // --- SUPABASE CONFIG ---
@@ -135,8 +135,8 @@ function SignalTableRow({ signal }) {
 }
 
 export default function AppMVP() {
-    const [signals, setSignals] = useState([]); // Start empty to avoid flash
-    const [loading, setLoading] = useState(true);
+    const [signals, setSignals] = useState([]);
+    const [loadingState, setLoadingState] = useState('CONNECTING'); // CONNECTING -> CONNECTED -> READY
     const [liveData, setLiveData] = useState(EURUSD_LIVE);
 
     // FETCH REAL DATA
@@ -171,7 +171,14 @@ export default function AppMVP() {
                 }));
                 setSignals(realSignals);
             }
-            setLoading(false);
+
+            // Artificial delay for UX: Show "Connected" success state
+            setTimeout(() => {
+                setLoadingState('CONNECTED');
+                setTimeout(() => {
+                    setLoadingState('READY');
+                }, 800); // Show "Connected" for 0.8s
+            }, 1000); // Minimum spinning time 1s
         };
 
         fetchSignals();
@@ -275,7 +282,7 @@ export default function AppMVP() {
                                 </tr>
                             </thead>
                             <tbody style={{ color: 'white' }}>
-                                {loading ? (
+                                {loadingState === 'CONNECTING' ? (
                                     <tr>
                                         <td colSpan="8" style={{ textAlign: 'center', padding: '50px', color: '#999' }}>
                                             <div style={{ display: 'inline-block', marginBottom: '15px' }} className="animate-spin">
@@ -285,6 +292,16 @@ export default function AppMVP() {
                                             <div style={{ fontSize: '0.9rem', color: '#666' }}>Fetching AI Signals</div>
                                         </td>
                                     </tr>
+                                ) : loadingState === 'CONNECTED' ? (
+                                    <tr>
+                                        <td colSpan="8" style={{ textAlign: 'center', padding: '50px', color: '#00BA88' }}>
+                                            <div style={{ display: 'inline-block', marginBottom: '15px' }}>
+                                                <CheckCircle size={40} color="#00BA88" />
+                                            </div>
+                                            <div style={{ fontSize: '1.2rem', color: '#00BA88', fontWeight: 'bold' }}>Connected Successfully ✅</div>
+                                            <div style={{ fontSize: '0.9rem', color: '#666' }}>Syncing Real-time Data...</div>
+                                        </td>
+                                    </tr>
                                 ) : signals.length === 0 ? (
                                     <tr>
                                         <td colSpan="8" style={{ textAlign: 'center', padding: '50px', color: '#999' }}>
@@ -292,7 +309,7 @@ export default function AppMVP() {
                                                 <AlertTriangle size={30} color="#FFD700" />
                                             </div>
                                             <div style={{ fontSize: '1.2rem', color: 'white' }}>Waiting for New Signals</div>
-                                            <div style={{ fontSize: '0.9rem', color: '#666' }}>Creating setup... Please wait.</div>
+                                            <div style={{ fontSize: '0.9rem', color: '#666' }}>System is scanning for high-probability setups...</div>
                                         </td>
                                     </tr>
                                 ) : (
