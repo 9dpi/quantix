@@ -100,9 +100,7 @@ const LiveTicker = memo(({ initialPrice }) => {
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     const [data, setData] = useState({
         price: initialPrice || null,
-        trend1H: 'BULLISH',
-        trend15M: 'BULLISH',
-        aiConfidence: 87
+        trend1H: 'BULLISH', // Initial fallback, will update with signals
     });
 
     useEffect(() => {
@@ -227,7 +225,7 @@ export default function AppMVP() {
                 .limit(10);
 
             if (data && !error && data.length > 0) {
-                // Set the current price from the LATEST signal
+                // Set the current price and trend from the LATEST signal
                 const latestSignal = data[0];
                 if (latestSignal.current_price) {
                     setCurrentPrice(latestSignal.current_price);
@@ -243,7 +241,6 @@ export default function AppMVP() {
                     sl: d.sl_price ? parseFloat(d.sl_price).toFixed(5) : (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(5),
                     tp1_raw: d.tp1_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)),
                     tp2_raw: d.tp2_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)),
-                    rr: '1:2.6',
                     conf: d.confidence_score,
                     status: d.signal_status || 'WAITING',
                     currentPrice: d.current_price || d.predicted_close,
@@ -288,7 +285,6 @@ export default function AppMVP() {
                         sl: d.sl_price ? parseFloat(d.sl_price).toFixed(5) : (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(5),
                         tp1_raw: d.tp1_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)),
                         tp2_raw: d.tp2_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)),
-                        rr: '1:2.6',
                         conf: d.confidence_score,
                         status: d.signal_status || 'WAITING',
                         currentPrice: d.current_price || d.predicted_close,
