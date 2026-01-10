@@ -1,8 +1,8 @@
 name: AI Signal Scanner (Cron)
 
 on:
-  schedule:
-    - cron: '*/15 * * * *' # Chạy mỗi 15 phút
+#   schedule:
+#     - cron: '*/15 * * * *' # Chạy mỗi 15 phút (DISABLED để tiết kiệm phút free)
   workflow_dispatch: # Cho phép bấm nút chạy thủ công để test
 
 jobs:
