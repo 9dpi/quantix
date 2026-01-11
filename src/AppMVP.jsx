@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo, useCallback } from 'react';
-import { TrendingUp, TrendingDown, Clipboard, Check, Radio, Activity, AlertTriangle, Target, XCircle, CheckCircle, Moon, Sun, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clipboard, Check, Radio, Activity, AlertTriangle, Target, XCircle, CheckCircle, Moon, Sun, Zap, Filter, ChevronDown, Sparkles } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
 // --- SUPABASE CONFIG ---
@@ -134,7 +134,6 @@ const LiveTicker = memo(({ initialPrice }) => {
                 <div style={{ textAlign: 'left', paddingLeft: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                         <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase', margin: 0 }}>EUR/USD LIVE</p>
-                        <span className="utc-clock">UTC {utcTime}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
                         <span style={{
@@ -165,14 +164,53 @@ const LiveTicker = memo(({ initialPrice }) => {
     );
 });
 
-// 3. Signal List Container - TikTok Optimized Bento Layout
-const SignalList = memo(({ signals, loadingState }) => {
+// 3. Filter Controls: Smart View Toggle Button (Simplified)
+const SmartToggle = memo(({ isSmartMode, setSmartMode }) => {
+    return (
+        <button
+            onClick={() => setSmartMode(!isSmartMode)}
+            style={{
+                background: isSmartMode
+                    ? 'linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%)'
+                    : 'rgba(255,255,255,0.03)',
+                border: `1px solid ${isSmartMode ? 'var(--primary)' : 'var(--border-color)'}`,
+                borderRadius: '12px',
+                padding: '8px 16px',
+                color: isSmartMode ? 'var(--primary)' : 'var(--text-secondary)',
+                fontSize: '0.75rem',
+                fontWeight: '800',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: isSmartMode ? '0 0 15px rgba(255, 215, 0, 0.2)' : 'none',
+                position: 'relative',
+                overflow: 'hidden'
+            }}
+        >
+            {isSmartMode ? <Sparkles size={14} /> : <Target size={14} />}
+            {isSmartMode ? 'SMART' : 'ALL'}
+
+            {isSmartMode && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                    animation: 'shimmer 2s infinite'
+                }} />
+            )}
+        </button>
+    );
+});
+
+// 4. Signal List Container - TikTok Optimized Bento Layout
+const SignalList = memo(({ signals, loadingState, totalSignalsCount }) => {
     return (
         <section className="tiktok-view-container">
-            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: 'var(--text-primary)', textAlign: 'center', fontWeight: '900' }}>
-                LIVE SIGNALS
-            </h2>
-
             {loadingState === 'CONNECTING' ? (
                 <div className="empty-state-container">
                     <div className="animate-spin" style={{ display: 'inline-block', marginBottom: '1rem' }}>
@@ -185,16 +223,22 @@ const SignalList = memo(({ signals, loadingState }) => {
                     </p>
                 </div>
             ) : signals.length === 0 ? (
-                <div className="empty-state-container">
-                    <AlertTriangle size={32} color="var(--primary)" style={{ marginBottom: '1rem' }} />
-                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>SCANNING LIQUIDITY ZONES...</div>
+                <div className="empty-state-container" style={{ opacity: 0, animation: 'fadeIn 0.5s forwards' }}>
+                    <Target size={32} color="var(--primary)" style={{ marginBottom: '1rem' }} />
+                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>WAITING FOR ALIGNMENT...</div>
                     <p className="empty-state-msg">
-                        Quantix AI is scanning 6,758+ data points across EUR/USD pairs.<br />
-                        Market volatility is currently low. Precision is our priority.
+                        {totalSignalsCount > 0
+                            ? "Quantix is filtering for the best entries. Currently, no signals meet the 70%+ confidence threshold. Stay tuned!"
+                            : "Quantix AI is scanning 6,758+ data points across EUR/USD pairs. Market volatility is currently low. Precision is our priority."}
                     </p>
                 </div>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '20px',
+                    transition: 'opacity 0.2s ease'
+                }}>
                     {signals.map(s => (
                         <SignalBentoCard key={s.id} signal={s} />
                     ))}
@@ -208,15 +252,25 @@ export default function AppMVP() {
     const [signals, setSignals] = useState([]);
     const [loadingState, setLoadingState] = useState('CONNECTING'); // CONNECTING -> CONNECTED -> READY
     const [currentPrice, setCurrentPrice] = useState(null);
-
     const [theme, setTheme] = useState('dark');
+    const [isSmartMode, setIsSmartMode] = useState(true);
 
     useEffect(() => {
         document.title = "Quantix AI Core";
         const savedTheme = localStorage.getItem('quantix_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         setTheme(savedTheme);
+
+        // Load Smart Mode preference
+        const savedSmartMode = localStorage.getItem('quantix_smart_mode');
+        if (savedSmartMode !== null) {
+            setIsSmartMode(savedSmartMode === 'true');
+        }
     }, []);
+
+    useEffect(() => {
+        localStorage.setItem('quantix_smart_mode', isSmartMode);
+    }, [isSmartMode]);
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -224,6 +278,25 @@ export default function AppMVP() {
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('quantix_theme', newTheme);
     };
+
+    // LOGIC: High-Performance Filtering (Smart Mode)
+    const filteredSignals = React.useMemo(() => {
+        const sortedSignals = [...signals].sort((a, b) => parseFloat(b.conf || 0) - parseFloat(a.conf || 0));
+        if (!isSmartMode) return sortedSignals.slice(0, 3);
+
+        const smartCandidates = sortedSignals.filter(sig => {
+            const confidence = parseFloat(sig.conf || 0);
+            const isHighConf = confidence >= 70;
+            const signalTime = new Date(sig.timestamp).getTime();
+            const now = new Date().getTime();
+            const isFresh = (now - signalTime) < (48 * 60 * 60 * 1000);
+            const isActive = !['SL_HIT', 'TP2_HIT', 'EXPIRED'].includes(sig.status);
+
+            return isHighConf && isFresh && isActive;
+        });
+
+        return smartCandidates.slice(0, 1);
+    }, [signals, isSmartMode]);
 
     // FETCH REAL DATA
     useEffect(() => {
@@ -240,16 +313,11 @@ export default function AppMVP() {
                 .select('*')
                 .eq('symbol', 'EURUSD=X')
                 .order('created_at', { ascending: false })
-                .limit(10);
+                .limit(20);
 
             if (data && !error && data.length > 0) {
-                // Set the current price and trend from the LATEST signal
                 const latestSignal = data[0];
-                if (latestSignal.current_price) {
-                    setCurrentPrice(latestSignal.current_price);
-                } else if (latestSignal.predicted_close) {
-                    setCurrentPrice(latestSignal.predicted_close);
-                }
+                if (latestSignal.current_price) setCurrentPrice(latestSignal.current_price);
 
                 const realSignals = data.map(d => ({
                     id: d.id,
@@ -261,40 +329,26 @@ export default function AppMVP() {
                     tp2_raw: d.tp2_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)),
                     conf: d.confidence_score,
                     status: d.signal_status || 'WAITING',
-                    currentPrice: d.current_price || d.predicted_close,
+                    timestamp: d.created_at,
                     time: new Date(d.created_at).toLocaleTimeString()
                 }));
                 setSignals(realSignals);
             }
 
-            // Artificial delay for UX
             setTimeout(() => {
                 setLoadingState('CONNECTED');
-                setTimeout(() => {
-                    setLoadingState('READY');
-                }, 800);
+                setTimeout(() => setLoadingState('READY'), 800);
             }, 1000);
         };
 
         fetchSignals();
 
-        // Subscribing to new signals
         const channel = supabase
             .channel('eurusd-signals')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'ai_signals',
-                    filter: 'symbol=eq.EURUSD=X'
-                },
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ai_signals', filter: 'symbol=eq.EURUSD=X' },
                 (payload) => {
                     const d = payload.new;
-
-                    // Update price immediately when new signal arrives
                     if (d.current_price) setCurrentPrice(d.current_price);
-
                     const newSignal = {
                         id: d.id,
                         pair: 'EUR/USD',
@@ -305,66 +359,67 @@ export default function AppMVP() {
                         tp2_raw: d.tp2_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)),
                         conf: d.confidence_score,
                         status: d.signal_status || 'WAITING',
-                        currentPrice: d.current_price || d.predicted_close,
+                        timestamp: d.created_at,
                         time: 'Now'
                     };
                     setSignals(prev => [newSignal, ...prev]);
                 }
-            )
-            .subscribe();
+            ).subscribe();
 
         return () => supabase.removeChannel(channel);
-
     }, []);
 
     return (
         <div style={{ fontFamily: "'Outfit', sans-serif", minHeight: '100vh', background: 'var(--bg-gradient)', color: 'var(--text-primary)' }}>
             {/* HEADER */}
-            <nav className="glass-panel" style={{ padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, borderRadius: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.location.href = '#/'}>
-                    <Activity color="var(--neon-blue)" size={24} />
-                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Quantix AI <span style={{ fontSize: '0.8rem', border: '1px solid var(--neon-blue)', padding: '2px 6px', borderRadius: '4px', color: 'var(--neon-blue)' }}>CORE</span></span>
+            <nav className="glass-panel" style={{ padding: '0.75rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, borderRadius: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => window.location.href = '#/'}>
+                    <Activity color="var(--neon-blue)" size={20} />
+                    <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Quantix AI <span style={{ fontSize: '0.7rem', border: '1px solid var(--neon-blue)', padding: '1px 4px', borderRadius: '4px', color: 'var(--neon-blue)' }}>CORE</span></span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    {/* Theme Toggle Button */}
-                    <button
-                        onClick={toggleTheme}
-                        style={{
-                            background: 'transparent',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: '50%',
-                            width: '36px',
-                            height: '36px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease'
-                        }}
-                        title={theme === 'light' ? "Switch to Dark Mode" : "Switch to Light Mode"}
-                    >
-                        {theme === 'light' ? <Moon size={18} color="var(--text-secondary)" /> : <Sun size={18} color="var(--primary)" />}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <button onClick={toggleTheme} style={{ background: 'transparent', border: '1px solid var(--border-color)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                        {theme === 'light' ? <Moon size={16} color="var(--text-secondary)" /> : <Sun size={16} color="var(--primary)" />}
                     </button>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: 'var(--color-buy)' }}>
-                        <Radio size={16} className="animate-pulse" /> LIVE MONITORING
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--color-buy)', fontWeight: 'bold' }}>
+                        <Radio size={14} className="animate-pulse" /> LIVE
                     </div>
                 </div>
             </nav>
 
-            <main className="container" style={{ padding: '2rem 0' }}>
+            <main className="container" style={{ padding: '1rem 0' }}>
                 <LiveTicker initialPrice={currentPrice} />
-                <SignalList signals={signals} loadingState={loadingState} />
+
+                <div className="ticker-container" style={{ margin: '1.5rem auto 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h2 style={{
+                        fontSize: '1.6rem',
+                        fontWeight: '950',
+                        letterSpacing: '-1.2px',
+                        margin: 0,
+                        textAlign: 'left',
+                        color: 'var(--text-primary)'
+                    }}>
+                        LIVE SIGNALS
+                    </h2>
+                    <SmartToggle isSmartMode={isSmartMode} setSmartMode={setIsSmartMode} />
+                </div>
+
+                <SignalList
+                    signals={filteredSignals}
+                    loadingState={loadingState}
+                    totalSignalsCount={signals.length}
+                />
 
                 {/* FOOTER */}
-                <footer style={{ textAlign: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '2rem' }}>
-                    <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                        <AlertTriangle size={16} color="orange" />
+                <footer style={{ textAlign: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', marginTop: '1.5rem' }}>
+                    <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.75rem', padding: '0 1rem' }}>
+                        <AlertTriangle size={14} color="orange" style={{ flexShrink: 0 }} />
                         Educational purposes only. Past performance does not guarantee future results.
                     </p>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.75rem', fontWeight: '500' }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '0.5rem', fontWeight: '500' }}>
                         Powered by <span style={{ color: 'var(--neon-blue)' }}>Quantix AI Core v1.5</span>
                     </p>
-                    <p style={{ color: 'var(--text-secondary)', opacity: 0.6, fontSize: '0.7rem', marginTop: '0.5rem' }}>
+                    <p style={{ color: 'var(--text-secondary)', opacity: 0.6, fontSize: '0.65rem', marginTop: '0.4rem' }}>
                         &copy; 2026 Quantix AI Core. Forensic Market Analysis System.
                     </p>
                 </footer>
