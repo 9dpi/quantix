@@ -73,10 +73,14 @@ export async function askQuantix(userQuestion) {
             return generateRawReport(marketData, signalData);
         }
 
-        // 1. Try AI Conversation
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const contextSummary = `Price: ${marketData?.close}, Signal: ${signalData?.signal_type}, Conf: ${signalData?.confidence_score}%`;
+        // 1. Try AI Conversation (DISABLED FOR STABILITY)
+        // const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
+        // DIRECT FALLBACK TO RAW REPORT
+        return generateRawReport(marketData, signalData);
+
+        /* 
+        const contextSummary = `Price: ${marketData?.close}, Signal: ${signalData?.signal_type}, Conf: ${signalData?.confidence_score}%`;
         const prompt = `
             You are Quantix AI, the "Soul" of this Quant Trading system. 
             
@@ -98,10 +102,10 @@ export async function askQuantix(userQuestion) {
             **RESPONSE RULES:**
             - Language: Respond in the SAME language used by the user.
             - Style: Expert, insightful, non-robotic.
-        `;
-
+        `; 
         const result = await model.generateContent(prompt);
         return result.response.text();
+        */
 
     } catch (error) {
         console.error("⚠️ AI Error:", error.message);

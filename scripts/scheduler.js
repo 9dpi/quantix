@@ -24,6 +24,34 @@ const TASKS = [
         command: 'npm',
         args: ['run', 'data:ingest:bulk', '--', '--years=10', '--assets=EURUSD,XAUUSD,GBPUSD'],
         description: 'Nạp 10 năm dữ liệu cho 3 cặp tiền'
+    },
+    {
+        name: 'Market Pulse Broadcast (Morning)',
+        time: '08:00',
+        command: 'node',
+        args: ['scripts/broadcast_market_pulse.js'],
+        description: 'Gửi nhận định thị trường sáng'
+    },
+    {
+        name: 'Market Pulse Broadcast (Noon)',
+        time: '12:00',
+        command: 'node',
+        args: ['scripts/broadcast_market_pulse.js'],
+        description: 'Gửi nhận định thị trường trưa'
+    },
+    {
+        name: 'Market Pulse Broadcast (Afternoon)',
+        time: '16:30', // Sau Gold Rush 30p
+        command: 'node',
+        args: ['scripts/broadcast_market_pulse.js'],
+        description: 'Gửi nhận định thị trường chiều'
+    },
+    {
+        name: 'Daily Trading Summary',
+        time: '23:55',
+        command: 'node',
+        args: ['scripts/daily_summary.js'],
+        description: 'Báo cáo tổng kết cuối ngày'
     }
 ];
 

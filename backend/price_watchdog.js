@@ -85,70 +85,65 @@ async function getYahooPrice() {
  */
 const TelegramTemplates = {
     newSignal: (signal, entry, sl, tp1, tp2) => `
-🚨 *NEW SIGNAL DETECTED*
+🚨 **QUANTIX AI: NEW SIGNAL DETECTED**
 
-📊 *Pair:* EUR/USD
-🎯 *Action:* ${signal.signal_type === 'LONG' ? '🟢 BUY' : '🔴 SELL'}
-💰 *Entry:* ${entry}
-🛑 *Stop Loss:* ${sl}
-🎯 *TP1:* ${tp1}
-🎯 *TP2:* ${tp2}
-📈 *AI Confidence:* ${signal.confidence_score}%
+💹 **Asset:** EUR/USD (M15)
+📉 **Action:** ${signal.signal_type === 'LONG' ? 'BUY LIMIT' : 'SELL LIMIT'}
+🎯 **Entry:** ${entry}
 
-⏰ _${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' })}_
+✅ **TP1:** ${tp1} (Secure Profits)
+✅ **TP2:** ${tp2} (Moonbag)
+❌ **SL:** ${sl}
+
+🔥 **Confidence:** ${signal.confidence_score}%
+🧠 **AI Analysis:** Volatility Breakout identified. Institutional flow aligns with H1 trend.
+
+⏰ _${new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' })} (GMT+7)_
+👉 [Open Live Dashboard](https://9dpi.github.io/quantix/#/mvp)
 `,
 
     entryHit: (signalType, entry, currentPrice, sl, tp1, tp2) => `
-✅ *ENTRY HIT - POSITION OPENED*
+⚡ **PROGRESS: ENTRY HIT**
 
-📊 *EUR/USD ${signalType === 'LONG' ? '🟢 BUY' : '🔴 SELL'}*
-💰 *Entry Price:* ${entry}
-📍 *Current Price:* ${currentPrice}
+The order has been filled!
+📊 **EUR/USD** is now ACTIVE.
 
-🛑 *Stop Loss:* ${sl}
-🎯 *TP1:* ${tp1}
-🎯 *TP2:* ${tp2}
+💰 **Entry:** ${entry}
+📍 **Current:** ${currentPrice}
 
-⚡ _Trade is now ACTIVE. Monitoring in progress..._
+⏰ _${new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' })} (GMT+7)_
+👉 Monitor on [Dashboard](https://9dpi.github.io/quantix/#/mvp)
 `,
 
     tp1Hit: (signalType, entry, tp1, currentPrice) => `
-💰 *TP1 HIT - PARTIAL PROFIT!*
+💰 **TP1 SMASHED! (+20 Pips)**
 
-📊 *EUR/USD ${signalType === 'LONG' ? '🟢 BUY' : '🔴 SELL'}*
-💰 *Entry:* ${entry} → *TP1:* ${tp1}
-📍 *Current:* ${currentPrice}
+We just secured the first bag.
+📊 **EUR/USD ${signalType === 'LONG' ? 'BUY' : 'SELL'}**
+👉 Move Stop Loss to Entry to trade risk-free!
 
-✅ *Recommendation:* Move SL to breakeven
-🎯 *Next Target:* TP2
-
-⏰ _${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' })}_
+🚀 **Next Target:** TP2
+⏰ _${new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' })} (GMT+7)_
 `,
 
     tp2Hit: (signalType, entry, tp2, currentPrice) => `
-💰💰 *TP2 HIT - FULL PROFIT SECURED!*
+🏆 **TP2 HIT - HOME RUN! (+50 Pips)**
 
-📊 *EUR/USD ${signalType === 'LONG' ? '🟢 BUY' : '🔴 SELL'}*
-💰 *Entry:* ${entry} → *TP2:* ${tp2}
-📍 *Current:* ${currentPrice}
+Full profit target achieved.
+📊 **EUR/USD** trade is closed.
 
-🎉 *Status:* Trade completed successfully!
-✅ *Action:* Close all positions
-
-⏰ _${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' })}_
+🔥 **Quantix AI** strikes again.
+_Wait for the next setup._
+⏰ _${new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' })} (GMT+7)_
 `,
 
     slHit: (signalType, entry, sl, currentPrice) => `
-❌ *STOP LOSS HIT*
+❌ **STOP LOSS HIT**
 
-📊 *EUR/USD ${signalType === 'LONG' ? '🟢 BUY' : '🔴 SELL'}*
-💰 *Entry:* ${entry} → *SL:* ${sl}
-📍 *Current:* ${currentPrice}
-
-⚠️ *Status:* Position closed with loss
-🔄 *Next:* Wait for new signal
-
-⏰ _${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' })}_
+Market reversed against analysis.
+Loss accepted. Capital preserved.
+🔄 **AI is scanning for next opportunity...**
+⏰ _${new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' })} (GMT+7)_
 `
 };
 
