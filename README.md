@@ -35,7 +35,7 @@ A **production-grade AI trading system** that:
 - 🌐 Displays live signals on GitHub Pages
 - 💾 Stores historical data for backtesting
 
-**Live Demo:** https://9dpi.github.io/ai-forecast-demo/#/mvp
+**Live Demo:** https://9dpi.github.io/quantix/#/mvp
 
 ---
 
@@ -191,13 +191,13 @@ npm run db:clean         # Clean test data
 ## 🔗 IMPORTANT LINKS
 
 **Production:**
-- Live Website: https://9dpi.github.io/ai-forecast-demo/#/mvp
+- Live Website: https://9dpi.github.io/quantix/#/mvp
 - Railway Dashboard: https://railway.app/dashboard
 - Supabase Dashboard: https://supabase.com/dashboard/project/gvglzvjsexeaectypkyk
 
 **Development:**
-- GitHub Repo: https://github.com/9dpi/ai-forecast-demo
-- GitHub Actions: https://github.com/9dpi/ai-forecast-demo/actions
+- GitHub Repo: https://github.com/9dpi/quantix
+- GitHub Actions: https://github.com/9dpi/quantix/actions
 
 **External APIs:**
 - Alpha Vantage: https://www.alphavantage.co/
@@ -245,7 +245,7 @@ npm run db:clean         # Clean test data
 3. Make your changes
 4. Submit a pull request
 
-**Issues?** Create a GitHub Issue: https://github.com/9dpi/ai-forecast-demo/issues
+**Issues?** Create a GitHub Issue: https://github.com/9dpi/quantix/issues
 
 ---
 
