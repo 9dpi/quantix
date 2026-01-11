@@ -194,7 +194,7 @@ export default function AppMVP() {
     const [theme, setTheme] = useState('dark');
 
     useEffect(() => {
-        document.title = "Signal Genius AI";
+        document.title = "Quantix AI Core";
         const savedTheme = localStorage.getItem('quantix_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         setTheme(savedTheme);
@@ -305,7 +305,7 @@ export default function AppMVP() {
             <nav className="glass-panel" style={{ padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, borderRadius: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.location.href = '#/'}>
                     <Activity color="var(--neon-blue)" size={24} />
-                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Signal Genius <span style={{ fontSize: '0.8rem', border: '1px solid var(--neon-blue)', padding: '2px 6px', borderRadius: '4px', color: 'var(--neon-blue)' }}>AI</span></span>
+                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Quantix AI <span style={{ fontSize: '0.8rem', border: '1px solid var(--neon-blue)', padding: '2px 6px', borderRadius: '4px', color: 'var(--neon-blue)' }}>CORE</span></span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     {/* Theme Toggle Button */}
@@ -347,7 +347,7 @@ export default function AppMVP() {
                         Powered by <span style={{ color: 'var(--neon-blue)' }}>Quantix AI Core v1.5</span>
                     </p>
                     <p style={{ color: 'var(--text-secondary)', opacity: 0.6, fontSize: '0.7rem', marginTop: '0.5rem' }}>
-                        &copy; 2026 Signal Genius AI. Forensic Market Analysis System.
+                        &copy; 2026 Quantix AI Core. Forensic Market Analysis System.
                     </p>
                 </footer>
             </main>

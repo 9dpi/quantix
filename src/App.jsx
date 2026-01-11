@@ -197,7 +197,7 @@ function Navbar({ t, onLoginClick, isLoggedIn, onLogout }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.location.reload()}>
           <Activity color="var(--primary)" size={28} />
           <span style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-heading)' }}>
-            Quantix <span className="text-gradient">AI</span> Forecast
+            Quantix <span className="text-gradient">AI</span> Core
           </span>
         </div>
 
