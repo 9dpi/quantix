@@ -1,0 +1,7 @@
+﻿[dotenv@17.2.3] injecting env (14) from .env -- tip: ≡ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+
+Γ£¿ BOT IDENTITY FOUND Γ£¿
+- Name: AI Forex Signal
+- Username: @ai_forex_9dpi_bot
+
+≡ƒæë Search for @ai_forex_9dpi_bot on Telegram to start chatting!

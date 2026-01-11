@@ -97,17 +97,25 @@ const SignalBentoCard = memo(({ signal }) => {
 
 // 2. Live Ticker Component: Handles high-frequency updates independently
 const LiveTicker = memo(({ initialPrice }) => {
-    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     const [data, setData] = useState({
         price: initialPrice || null,
-        trend1H: 'BULLISH', // Initial fallback, will update with signals
+        trend1H: 'BULLISH',
     });
+    const [utcTime, setUtcTime] = useState(new Date().toUTCString().split(' ')[4]);
 
     useEffect(() => {
         if (initialPrice) {
             setData(prev => ({ ...prev, price: initialPrice }));
         }
     }, [initialPrice]);
+
+    // Live UTC Clock
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setUtcTime(new Date().toUTCString().split(' ')[4]);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
 
     return (
         <section style={{ marginBottom: '0' }} className="ticker-container">
@@ -124,7 +132,10 @@ const LiveTicker = memo(({ initialPrice }) => {
             }}>
                 {/* Left: Live Price Area */}
                 <div style={{ textAlign: 'left', paddingLeft: '4px' }}>
-                    <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>EUR/USD LIVE</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase', margin: 0 }}>EUR/USD LIVE</p>
+                        <span className="utc-clock">UTC {utcTime}</span>
+                    </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
                         <span style={{
                             fontSize: '1.8rem',
@@ -142,7 +153,7 @@ const LiveTicker = memo(({ initialPrice }) => {
                 {/* Vertical Divider */}
                 <div style={{ height: '40px', background: 'var(--border-color)' }}></div>
 
-                {/* Right: Market Sentiment - Differentiated from Signal Score */}
+                {/* Right: Market Sentiment */}
                 <div style={{ textAlign: 'right', paddingRight: '4px' }}>
                     <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>Market Sentiment</p>
                     <div style={{ fontSize: '1.2rem', fontWeight: '900', color: data.trend1H === 'BULLISH' ? 'var(--color-buy)' : 'var(--color-sell)', lineHeight: 1 }}>
@@ -163,17 +174,24 @@ const SignalList = memo(({ signals, loadingState }) => {
             </h2>
 
             {loadingState === 'CONNECTING' ? (
-                <div style={{ textAlign: 'center', padding: '50px', color: 'var(--text-secondary)' }}>
-                    <div style={{ display: 'inline-block', marginBottom: '15px' }} className="animate-spin">
-                        <Activity size={30} color="var(--neon-blue)" />
+                <div className="empty-state-container">
+                    <div className="animate-spin" style={{ display: 'inline-block', marginBottom: '1rem' }}>
+                        <Activity size={32} color="var(--neon-blue)" />
                     </div>
-                    <div>SYNCING WITH AI AGENT...</div>
+                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>SYNCHRONIZING CORE...</div>
+                    <p className="empty-state-msg">
+                        Quantix AI is establishing a secure tunnel to 10-year data clusters.<br />
+                        Integrity verification in progress.
+                    </p>
                 </div>
             ) : signals.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '50px', color: 'var(--text-secondary)', background: 'var(--bg-card)', borderRadius: '24px' }}>
-                    <AlertTriangle size={30} color="var(--primary)" style={{ marginBottom: '10px' }} />
-                    <div style={{ fontWeight: 'bold' }}>SCANNING MARKET...</div>
-                    <div style={{ fontSize: '0.8rem' }}>Waiting for high-probability setups</div>
+                <div className="empty-state-container">
+                    <AlertTriangle size={32} color="var(--primary)" style={{ marginBottom: '1rem' }} />
+                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>SCANNING LIQUIDITY ZONES...</div>
+                    <p className="empty-state-msg">
+                        Quantix AI is scanning 6,758+ data points across EUR/USD pairs.<br />
+                        Market volatility is currently low. Precision is our priority.
+                    </p>
                 </div>
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

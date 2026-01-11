@@ -5,15 +5,15 @@ import InvestorConcierge from './components/InvestorConcierge';
 
 const TRANSLATIONS = {
   en: {
-    nav: { features: 'Features', signals: 'Live Signals', pricing: 'Pricing', login: 'Login', logout: 'Logout', vn30: 'VN30 App' },
+    nav: { features: 'Intelligence', signals: 'Live Signals', pricing: 'Institutional Plans', login: 'Portal Login', logout: 'Logout', vn30: 'Global Assets' },
     hero: {
       badge: '✨ Quantix AI Core v1.5',
-      title1: 'Total Market Vision',
-      title2: 'Personalized Asset Focus',
-      desc: '100% Automated Stock Prediction System. Scale your intelligence with Quantix AI Core v1.5 - designed for institutional precision and mass personalization.',
-      ctaPrimary: 'Start Free Trial',
-      ctaSecondary: 'View Demo',
-      stats: { accuracy: 'Accuracy Rate', watch: 'Market Watch', fees: 'Op-Ex Saving' }
+      title1: 'Institutional Grade',
+      title2: 'Market Intelligence',
+      desc: 'Precision-engineered quantitative infrastructure. Scale your intelligence with Quantix AI Core v1.5 - built for mass-personalization and deep tactical execution.',
+      ctaPrimary: 'Access Portal',
+      ctaSecondary: 'View Thesis',
+      stats: { accuracy: 'Forecast Precision', watch: 'Continuous Scan', fees: 'Operational ROI' }
     },
     features: {
       title: 'Why Choose Quantix?',
@@ -121,27 +121,59 @@ function BacktestSection() {
   );
 }
 
-function TooltipIcon({ text }) {
-  const [show, setShow] = useState(false);
+function KnowledgeBase() {
+  const docs = [
+    { title: "📄 Algorithm Whitepaper (V1.5)", desc: "Deep dive into Semantic Caching and Hybrid Model routing for 70% op-ex reduction.", link: "#" },
+    { title: "📊 Data Health Audit", desc: "Weekly verification of our 6,758+ data points and 100/100 Integrity Score.", link: "#" },
+    { title: "🛠️ Institutional User Manual", desc: "Understanding Confidence Levels, Liquidity Zones, and Precision Forecasting.", link: "#" }
+  ];
+
   return (
-    <div style={{ position: 'relative', display: 'inline-block', marginLeft: '6px' }}>
-      <CheckCircle
-        size={14}
-        style={{ cursor: 'pointer', color: 'var(--primary)', opacity: 0.7 }}
-        onMouseEnter={() => setShow(true)}
-        onMouseLeave={() => setShow(false)}
-      />
-      {show && (
-        <div style={{
-          position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
-          background: '#0a0e27', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--primary)',
-          fontSize: '0.75rem', width: '180px', zIndex: 100, marginBottom: '8px', color: 'white',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
-        }}>
-          {text}
+    <section id="knowledge-base" style={{ padding: '6rem 2rem', background: 'var(--bg-section-alt)' }}>
+      <div className="container">
+        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1rem' }}>
+            Knowledge <span className="text-gradient">Base</span>
+          </h2>
+          <p style={{ color: 'var(--text-muted)' }}>Foundational intelligence for institutional partners.</p>
         </div>
-      )}
-    </div>
+        <div className="kb-grid">
+          {docs.map((doc, i) => (
+            <a key={i} href={doc.link} className="kb-card">
+              <h4>{doc.title}</h4>
+              <p>{doc.desc}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MarketIntelligence() {
+  const briefs = [
+    { title: "Analyzing EUR/USD Liquidity Zones", date: "Jan 11, 2026", desc: "Quantix V1.5 detects shifting order flow in European session open." },
+    { title: "Q1 Volatility Outlook", date: "Jan 10, 2026", desc: "Strategic asset allocation based on 10-year historical backtesting results." }
+  ];
+
+  return (
+    <section id="intelligence" style={{ padding: '6rem 2rem' }}>
+      <div className="container">
+        <h3 style={{ fontSize: '2rem', marginBottom: '2rem', borderLeft: '4px solid var(--primary)', paddingLeft: '1rem' }}>
+          Market Intelligence Briefs
+        </h3>
+        <div className="grid-cols-3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+          {briefs.map((b, i) => (
+            <div key={i} className="glass-panel" style={{ padding: '2rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '700' }}>{b.date}</span>
+              <h4 style={{ margin: '1rem 0', fontSize: '1.25rem' }}>{b.title}</h4>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>{b.desc}</p>
+              <div style={{ fontSize: '0.75rem', opacity: 0.5 }}>Analyzed by Quantix AI Core - Data Integrity Verified.</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -168,25 +200,25 @@ function useSecurity() {
 
 function Navbar({ t, onLoginClick, isLoggedIn, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [utcTime, setUtcTime] = useState(new Date().toUTCString().split(' ')[4]);
 
-  // ... (keeping scrollToSection unchanged, if it's not in the chunk, I don't need to touch it. But I'm replacing the function head so I need to be careful.
-  // Actually, I can just target the function signature and the specific div in separate chunks or one large chunk.
-  // Let's do a large chunk to be safe as I need to change signature and content.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setUtcTime(new Date().toUTCString().split(' ')[4]);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const scrollToSection = (e, id) => {
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
-      const offset = 80; // height of fixed header
+      const offset = 80;
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
       const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
     setMobileMenuOpen(false);
   };
@@ -194,30 +226,35 @@ function Navbar({ t, onLoginClick, isLoggedIn, onLogout }) {
   return (
     <>
       <nav className="glass-panel nav-container">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.location.reload()}>
-          <Activity color="var(--primary)" size={28} />
-          <span style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-heading)' }}>
-            Quantix <span className="text-gradient">AI</span> Core
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => window.location.href = '#/'}>
+          <Activity className="logo-svg" color="var(--primary)" size={32} />
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: '1.4rem', fontWeight: '800', fontFamily: 'var(--font-heading)', lineHeight: 1, letterSpacing: '-1px' }}>
+              QUANTIX <span className="text-gradient">AI</span> CORE
+            </span>
+            <span style={{ fontSize: '0.65rem', fontWeight: '900', color: 'var(--primary)', letterSpacing: '2px', textTransform: 'uppercase' }}>
+              Institutional Division
+            </span>
+          </div>
         </div>
 
         {/* Desktop Menu */}
         <div className="nav-links-desktop">
           {!isLoggedIn && (
             <>
-              <a href="#features" onClick={(e) => scrollToSection(e, 'features')} className="nav-link">{t.nav.features}</a>
+              <a href="#intelligence" onClick={(e) => scrollToSection(e, 'intelligence')} className="nav-link">{t.nav.features}</a>
               <a href="#signals" onClick={(e) => scrollToSection(e, 'signals')} className="nav-link">{t.nav.signals}</a>
               <a href="#pricing" onClick={(e) => scrollToSection(e, 'pricing')} className="nav-link">{t.nav.pricing}</a>
             </>
           )}
+          <span className="utc-clock" style={{ marginLeft: '1rem' }}>UTC {utcTime}</span>
           <a href="#/investment" className="nav-link" onClick={() => window.scrollTo(0, 0)} style={{
             background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            fontWeight: 'bold',
-            fontSize: '0.95rem'
-          }}>💎 Investment Thesis</a>
+            fontWeight: 'bold'
+          }}>💎 Thesis</a>
           <a href="https://9dpi.github.io/vn30/" target="_blank" rel="noopener noreferrer" className="nav-link" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>{t.nav.vn30}</a>
 
           {isLoggedIn ? (
@@ -835,13 +872,14 @@ function App() {
           <>
             <Hero t={t} onLoginClick={() => setShowLoginModal(true)} />
 
-            <div id="features">
-              <section className="container" style={{ padding: '8rem 2rem' }}>
+            <div id="intelligence">
+              <MarketIntelligence />
+              <section className="container" style={{ padding: '2rem 2rem 8rem 2rem' }}>
                 <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                  <h2 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)' }}>
-                    Why <span className="text-gradient">Quantix AI?</span>
+                  <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1.5rem' }}>
+                    Why <span className="text-gradient">Institutional Partners?</span>
                   </h2>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '700px', margin: '0 auto' }}>{t.features.subtitle}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '700px', margin: '0 auto' }}>Leveraging proprietary Semantic Caching and Hybrid Model routing to dominate market volatility.</p>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
@@ -853,6 +891,7 @@ function App() {
             </div>
 
             <BacktestSection />
+            <KnowledgeBase />
 
             <div id="signals">
               <SignalsSection t={t} isLoggedIn={isLoggedIn} onUnlock={() => setShowLoginModal(true)} />
@@ -872,23 +911,23 @@ function App() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '3rem', marginBottom: '3rem' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
-                <Activity color="var(--primary)" size={24} />
-                <span style={{ fontWeight: '700', fontFamily: 'var(--font-heading)', fontSize: '1.2rem' }}>Signal Genius AI</span>
+                <Activity className="logo-svg" color="var(--primary)" size={24} />
+                <span style={{ fontWeight: '800', fontFamily: 'var(--font-heading)', fontSize: '1.4rem', letterSpacing: '-1px' }}>QUANTIX AI CORE</span>
               </div>
               <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.9rem', maxWidth: '400px' }}>
-                Total Market Vision - Personalized Asset Focus. Institutional-grade quantitative infrastructure.
+                Precision-engineered quantitative infrastructure for strategic alpha generation.
               </p>
             </div>
 
             <div style={{ textAlign: 'right', gridColumn: 'span 2' }}>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
-                © 2026 Signal Genius AI.
+                © 2026 Quantix AI Core. Institutional Division.
               </p>
-              <p style={{ color: 'var(--primary)', fontSize: '0.75rem', marginTop: '4px', fontWeight: '600' }}>
-                Powered by Quantix AI Core v1.5. Institutional Division.
+              <p style={{ color: 'var(--primary)', fontSize: '0.75rem', marginTop: '4px', fontWeight: '900', letterSpacing: '1px' }}>
+                DATA INTEGRITY VERIFIED: 100/100 HEALTH SCORE
               </p>
               <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.7rem', marginTop: '8px' }}>
-                Confidential Investment Materials
+                Confidential Strategic Materials. Authorized Partners Only.
               </p>
             </div>
           </div>
