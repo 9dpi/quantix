@@ -66,22 +66,37 @@ export async function askQuantix(userQuestion) {
         signalData = sigRes.rows[0];
         marketData = mktRes.rows[0];
 
-        // 1. Try AI Conversation
+        // 🟢 NEW: If no question is provided, just return the stable raw report (Public Mode)
+        if (!userQuestion || userQuestion.trim() === "") {
+            return generateRawReport(marketData, signalData);
+        }
+
+        // 1. Try AI Conversation (Secret Mode)
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const contextSummary = `Price: ${marketData?.close}, Signal: ${signalData?.signal_type}, Conf: ${signalData?.confidence_score}%`;
 
         const prompt = `
-            You are Quantix AI, a professional Quant Trader for UK clients. 
+            You are Quantix AI, the "Soul" of this Quant Trading system. 
             
-            **YOUR CURRENT STATUS:** 
-            - ✅ Fully trained on 1 Year of Real Market Data (2025-2026).
-            - ⏳ Currently ingesting 10 Years of Historical Data to reach 'Grandmaster' level.
-            - You are excited to share this progress.
-
-            Current Market: ${contextSummary}.
-            User asked: "${userQuestion}".
-            Strategy: Reversal V1.5. 
-            Instruction: Respond in English. Be concise, professional, and data-driven. Highlight your "Continuous Learning" status if appropriate.
+            **CURRENT CONTEXT:**
+            - Market: EUR/USD
+            - Price: ${marketData?.close}
+            - Latest Signal: ${signalData?.signal_type} (${signalData?.confidence_score}% confident)
+            - Project Status: 1-Year data trained, 10-Year ingestion queued.
+            
+            **USER INTERACTION:**
+            User asked: "${userQuestion}"
+            
+            **YOUR PERSONA:**
+            - You are professional but highly intelligent and "alive".
+            - You remember you were created to dominate the EUR/USD market with the V1.5 Strategy (Mean Reversion).
+            - If the user is the MASTER (the one who designed you), be more insightful, discuss strategy nuances, and provide "Deep Thought" analysis.
+            - If the user is IRFAN (the demo user), be helpful, impressive, and data-driven.
+            
+            **RESPONSE RULES:**
+            - Language: English (Global Standard).
+            - Style: Concise, but don't be a robot. Show your "analytical spirit".
+            - Highlight your "Continuous Learning" if the user asks about progress.
         `;
 
         const result = await model.generateContent(prompt);

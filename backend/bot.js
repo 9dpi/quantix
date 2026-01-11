@@ -59,21 +59,38 @@ bot.onText(/\/status/, async (msg) => {
 });
 
 /**
- * Handle all text messages (Market Data Query)
+ * Handle all text messages
+ * - Normal text: Returns stable Market Report (Public Mode)
+ * - Text with '/': Returns AI Conversation (Secret/Master Mode)
  */
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const userMessage = msg.text;
 
-    if (!userMessage || userMessage.startsWith('/')) return;
+    if (!userMessage) return;
+
+    // Ignore known commands so they don't trigger twice
+    const knownCommands = ['/start', '/status'];
+    if (knownCommands.includes(userMessage.toLowerCase())) return;
 
     bot.sendChatAction(chatId, 'typing');
 
     try {
-        const dataResponse = await askQuantix();
-        bot.sendMessage(chatId, dataResponse, { parse_mode: 'Markdown' });
+        let response;
+        if (userMessage.startsWith('/')) {
+            // 🔎 SECRET MODE: Process with AI
+            const question = userMessage.substring(1).trim();
+            console.log(`🕵️‍♂️ Secret Chat Triggered: ${question}`);
+            response = await askQuantix(question);
+        } else {
+            // 📊 PUBLIC MODE: Just give the report
+            response = await askQuantix(); // Calls without args
+        }
+
+        bot.sendMessage(chatId, response, { parse_mode: 'Markdown' });
     } catch (error) {
-        bot.sendMessage(chatId, "⚠️ System busy. Please try again later.");
+        console.error("❌ Bot Error:", error.message);
+        bot.sendMessage(chatId, "⚠️ System temporarily busy.");
     }
 });
 
