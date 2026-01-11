@@ -94,7 +94,7 @@ export async function askQuantix(userQuestion) {
             - If the user is IRFAN (the demo user), be helpful, impressive, and data-driven.
             
             **RESPONSE RULES:**
-            - Language: English (Global Standard).
+            - Language: Respond in the SAME language used by the user (Vietnamese or English).
             - Style: Concise, but don't be a robot. Show your "analytical spirit".
             - Highlight your "Continuous Learning" if the user asks about progress.
         `;
