@@ -357,7 +357,7 @@ async function startWatchdog() {
     console.log("-----------------------------------\n");
 
     // Chạy ngay lần đầu
-    await sendTelegramAlert("🚀 *Signal Genius AI* is now ONLINE and monitoring EUR/USD.");
+    await sendTelegramAlert("🚀 *Quantix AI Core* is now ONLINE and monitoring EUR/USD.");
     await watchSignals();
 
     // Sau đó lặp lại theo POLLING_INTERVAL

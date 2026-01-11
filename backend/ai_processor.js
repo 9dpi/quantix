@@ -1,7 +1,6 @@
 /**
- * ⚡ QUANTIX AI PROCESSOR (V3.0 HYBRID - GLOBAL)
- * Features: Gemini AI Conversation + Stable Data Fallback
- * Language: English
+ * ⚡ QUANTIX AI PROCESSOR (V3.1 STABLE - MULTILINGUAL)
+ * Features: Deep AI Conversation + Reliable Data Fallback
  */
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -38,11 +37,15 @@ function generateRawReport(market, signal) {
     report += `🔹 **Session:** H: ${high.toFixed(5)} | L: ${low.toFixed(5)}\n\n`;
 
     if (signal) {
+        const entry = parseFloat(signal.entry_price || signal.predicted_close || 0);
+        const tp = parseFloat(signal.tp1_price || 0);
+        const sl = parseFloat(signal.sl_price || 0);
+
         report += `🎯 **LATEST SIGNAL:**\n`;
         report += `• Action: **${signal.signal_type}**\n`;
         report += `• Conf: ${signal.confidence_score}%\n`;
-        report += `• Entry: ${parseFloat(signal.entry_price).toFixed(5)}\n`;
-        report += `• TP: ${parseFloat(signal.tp1_price).toFixed(5)} | SL: ${parseFloat(signal.sl_price).toFixed(5)}\n`;
+        report += `• Entry: ${entry > 0 ? entry.toFixed(5) : 'Calculating...'}\n`;
+        report += `• TP: ${tp.toFixed(5)} | SL: ${sl.toFixed(5)}\n`;
     }
 
     report += `\n🚀 **Status:** Trained on 1-Year Real Data`;
@@ -59,19 +62,18 @@ export async function askQuantix(userQuestion) {
     let signalData = null;
 
     try {
-        // Fetch Context
         const sigRes = await client.query(`SELECT * FROM ai_signals WHERE symbol = 'EURUSD=X' ORDER BY created_at DESC LIMIT 1`);
         const mktRes = await client.query(`SELECT * FROM market_data WHERE symbol = 'EURUSD=X' ORDER BY timestamp_utc DESC LIMIT 1`);
 
         signalData = sigRes.rows[0];
         marketData = mktRes.rows[0];
 
-        // 🟢 NEW: If no question is provided, just return the stable raw report (Public Mode)
+        // If explicitly requested just data (empty question)
         if (!userQuestion || userQuestion.trim() === "") {
             return generateRawReport(marketData, signalData);
         }
 
-        // 1. Try AI Conversation (Secret Mode)
+        // 1. Try AI Conversation
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const contextSummary = `Price: ${marketData?.close}, Signal: ${signalData?.signal_type}, Conf: ${signalData?.confidence_score}%`;
 
@@ -89,22 +91,20 @@ export async function askQuantix(userQuestion) {
             
             **YOUR PERSONA:**
             - You are professional but highly intelligent and "alive".
-            - You remember you were created to dominate the EUR/USD market with the V1.5 Strategy (Mean Reversion).
-            - If the user is the MASTER (the one who designed you), be more insightful, discuss strategy nuances, and provide "Deep Thought" analysis.
-            - If the user is IRFAN (the demo user), be helpful, impressive, and data-driven.
+            - You are the creator's companion.
+            - If the user uses Vietnamese, respond in Vietnamese. If English, use English.
+            - Provide deep analysis, insights, and expert status.
             
             **RESPONSE RULES:**
-            - Language: Respond in the SAME language used by the user (Vietnamese or English).
-            - Style: Concise, but don't be a robot. Show your "analytical spirit".
-            - Highlight your "Continuous Learning" if the user asks about progress.
+            - Language: Respond in the SAME language used by the user.
+            - Style: Expert, insightful, non-robotic.
         `;
 
         const result = await model.generateContent(prompt);
         return result.response.text();
 
     } catch (error) {
-        console.error("⚠️ AI Fallback Triggered:", error.message);
-        // 2. Fail-safe: Return clean raw data if AI fails
+        console.error("⚠️ AI Error:", error.message);
         return generateRawReport(marketData, signalData);
     } finally {
         client.release();
