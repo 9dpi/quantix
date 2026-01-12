@@ -50,8 +50,31 @@ const SignalBentoCard = memo(({ signal }) => {
 
                 {/* ACTION BADGE - Full Width & Strong */}
                 <div className={`action-badge-full ${signal.action.toLowerCase()}`}>
-                    <Zap size={32} fill="currentColor" />
+                    < Zap size={32} fill="currentColor" />
                     {signal.action}
+                </div>
+
+                {/* RISK WARNING SYSTEM - Honesty for Irfan */}
+                <div style={{
+                    marginTop: '12px',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    fontSize: '0.65rem',
+                    fontWeight: '800',
+                    textAlign: 'center',
+                    background: confidence < 70 ? 'rgba(255, 68, 68, 0.1)' : confidence < 85 ? 'rgba(255, 165, 0, 0.1)' : 'rgba(0, 255, 128, 0.1)',
+                    border: `1px solid ${confidence < 70 ? '#ff4444' : confidence < 85 ? '#ffa500' : '#00ff80'}`,
+                    color: confidence < 70 ? '#ff4444' : confidence < 85 ? '#ffa500' : '#00ff80',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    letterSpacing: '0.5px'
+                }}>
+                    <AlertTriangle size={12} />
+                    {confidence < 70 ? 'SPECTRUM RISK: SPECULATIVE SETUP' :
+                        confidence < 85 ? 'STABLE RISK: MODERATE ALIGNMENT' :
+                            'INSTITUTIONAL GRADE: HIGH CONVICTION'}
                 </div>
             </div>
 
@@ -279,21 +302,33 @@ export default function AppMVP() {
         localStorage.setItem('quantix_theme', newTheme);
     };
 
-    // LOGIC: High-Performance Filtering (Smart Mode)
+    // LOGIC: High-Performance Filtering (Never Static for Irfan)
     const filteredSignals = React.useMemo(() => {
         const sortedSignals = [...signals].sort((a, b) => parseFloat(b.conf || 0) - parseFloat(a.conf || 0));
-        if (!isSmartMode) return sortedSignals.slice(0, 3);
 
-        const smartCandidates = sortedSignals.filter(sig => {
+        // Mode ALL: Show Top 3 most recent/highest conf active signals
+        if (!isSmartMode) {
+            return sortedSignals
+                .filter(sig => !['SL_HIT', 'TP2_HIT', 'EXPIRED'].includes(sig.status))
+                .slice(0, 3);
+        }
+
+        // Mode SMART: Try strict limit first
+        let smartCandidates = sortedSignals.filter(sig => {
             const confidence = parseFloat(sig.conf || 0);
             const isHighConf = confidence >= 70;
             const signalTime = new Date(sig.timestamp).getTime();
             const now = new Date().getTime();
             const isFresh = (now - signalTime) < (48 * 60 * 60 * 1000);
             const isActive = !['SL_HIT', 'TP2_HIT', 'EXPIRED'].includes(sig.status);
-
             return isHighConf && isFresh && isActive;
         });
+
+        // FALLBACK: If AI is too strict, show the single best available authentic signal
+        if (smartCandidates.length === 0 && sortedSignals.length > 0) {
+            const bestActive = sortedSignals.find(sig => !['SL_HIT', 'TP2_HIT', 'EXPIRED'].includes(sig.status));
+            if (bestActive) smartCandidates = [bestActive];
+        }
 
         return smartCandidates.slice(0, 1);
     }, [signals, isSmartMode]);
