@@ -93,7 +93,7 @@ export default function MvpDashboard() {
         }
     };
 
-    // 2. Lifecycle & Data Management
+    // 2. Lifecycle & Data Management (Real-time Upgrade)
     useEffect(() => {
         if (!isAuthorized) return;
 
@@ -103,10 +103,28 @@ export default function MvpDashboard() {
         const fetchMetrics = async () => {
             if (!supabase) return;
             try {
-                const { count } = await supabase.from('signals').select('*', { count: 'exact', head: true });
-                setRealMetrics({ totalSignals: count || 0, lastUpdate: getLondonTime() });
+                // Query correct table 'ai_signals'
+                const { count } = await supabase.from('ai_signals').select('*', { count: 'exact', head: true });
+                setRealMetrics(prev => ({ ...prev, totalSignals: count || 0 }));
             } catch (e) { console.error("Fetch failed:", e); }
         };
+
+        // REAL-TIME SUBSCRIPTION: The "TradingView" Experience ⚡
+        const channel = supabase
+            .channel('public:ai_signals')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'ai_signals' }, (payload) => {
+                console.log('🔥 Real-time Update:', payload);
+                fetchMetrics(); // Refresh count
+                setRealMetrics(prev => ({ ...prev, lastUpdate: getLondonTime() }));
+
+                if (payload.eventType === 'INSERT') {
+                    addLog('SUCCESS', `New Signal Detected: ${payload.new.symbol} - ${payload.new.signal_type}`);
+                } else if (payload.eventType === 'UPDATE') {
+                    // Price update log (optional, can be noisy)
+                    // addLog('INFO', `Price Update: ${payload.new.symbol} @ ${payload.new.current_price}`);
+                }
+            })
+            .subscribe();
 
         const brandedLogs = [
             { type: 'TECH', msg: 'Neural Momentum: Ingesting high-volatility raw data.' },
@@ -118,15 +136,17 @@ export default function MvpDashboard() {
         const logTimer = setInterval(() => {
             const randomLog = brandedLogs[Math.floor(Math.random() * brandedLogs.length)];
             addLog(randomLog.type, randomLog.msg);
-        }, 30000); // 30s instead of 20s for CPU
+        }, 30000);
 
         fetchMetrics();
-        const dataTimer = setInterval(fetchMetrics, 60000); // 60s for CPU
+        // Keep a slow poll as backup, but rely on Real-time
+        const dataTimer = setInterval(fetchMetrics, 30000);
 
         return () => {
             clearInterval(pipelineTimer);
             clearInterval(logTimer);
             clearInterval(dataTimer);
+            supabase.removeChannel(channel); // Cleanup subscription
         };
     }, [isAuthorized, addLog]);
 

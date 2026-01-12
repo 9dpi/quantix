@@ -25,7 +25,7 @@ async function inspectSchema() {
         const res = await client.query(`
             SELECT column_name, data_type 
             FROM information_schema.columns 
-            WHERE table_name = 'ai_signals'
+            WHERE table_name = 'market_data'
         `);
 
         console.log("Columns:", res.rows.map(r => `${r.column_name} (${r.data_type})`).join(', '));
