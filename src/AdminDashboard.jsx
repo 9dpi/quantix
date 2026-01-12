@@ -91,14 +91,11 @@ export default function AdminDashboard() {
     };
 
     const scrollToBottom = () => {
-        if (logContainerRef.current) {
-            logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
-        }
+        logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     useEffect(() => {
-        if (!isAuthorized) return; // V1.8.1: Block all side effects until authorized
-
+        if (!isAuthorized) return;
         scrollToBottom();
     }, [logs, isAuthorized]);
 
