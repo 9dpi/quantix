@@ -1,0 +1,36 @@
+name: AI Signal Scanner (Cron)
+
+on:
+#   schedule:
+#     - cron: '*/15 * * * *' # Chạy mỗi 15 phút (DISABLED để tiết kiệm phút free)
+  workflow_dispatch: # Cho phép bấm nút chạy thủ công để test
+
+jobs:
+  scan-and-predict:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Run Scanner Engine (Single-shot)
+      env:
+        # Quan trọng: Cần cấu hình Secrets trong GitHub Repository Settings
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+      run: |
+        # Chạy scanner trong 55 giây rồi tự tắt (để phù hợp logic cron)
+        # Vì mặc định scanner_engine.js dùng setInterval vĩnh viễn
+        # nên ta dùng 'timeout' để ngắt nó sau 1 lần quét
+        timeout 55s node backend/scanner_engine.js || true

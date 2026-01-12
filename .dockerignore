@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+.github
+
+# Dependencies (will be installed fresh)
+node_modules
+
+# Environment
+.env.local
+.env.development
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Build artifacts (frontend - not needed for backend)
+dist
+build
+.cache
+
+# Documentation
+README.md
+docs
+*.md
+
+# Test files
+*.test.js
+__tests__
+coverage
+
+# Temporary files
+.tmp
+temp
