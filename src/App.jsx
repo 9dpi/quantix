@@ -70,12 +70,12 @@ const TRANSLATIONS = {
 };
 
 const BACKTEST_DATA = [
-  { date: 'Oct 23', Signal Genius: 100, vn30: 100 },
-  { date: 'Nov 23', Signal Genius: 112, vn30: 102 },
-  { date: 'Dec 23', Signal Genius: 125, vn30: 105 },
-  { date: 'Jan 24', Signal Genius: 138, vn30: 108 },
-  { date: 'Feb 24', Signal Genius: 155, vn30: 112 },
-  { date: 'Mar 24', Signal Genius: 172, vn30: 115 },
+  { date: 'Oct 23', signalgenius: 100, vn30: 100 },
+  { date: 'Nov 23', signalgenius: 112, vn30: 102 },
+  { date: 'Dec 23', signalgenius: 125, vn30: 105 },
+  { date: 'Jan 24', signalgenius: 138, vn30: 108 },
+  { date: 'Feb 24', signalgenius: 155, vn30: 112 },
+  { date: 'Mar 24', signalgenius: 172, vn30: 115 },
 ];
 
 function BacktestSection() {
