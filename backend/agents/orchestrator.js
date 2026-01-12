@@ -14,7 +14,7 @@ class MultiAgentOrchestrator {
     constructor() {
         this.name = 'ORCHESTRATOR';
         this.shadowMode = true; // Enable shadow mode for first 24h
-        this.shadowModeThreshold = 85; // Only emit signals >= 85% confidence
+        this.shadowModeThreshold = 10; // FOR TESTING: Only emit signals >= 10% confidence
         this.shadowModeStartTime = new Date();
         this.signalHistory = [];
         this.rejectedCounter = 0;

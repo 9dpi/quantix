@@ -372,27 +372,24 @@ async function watchSignals() {
  */
 async function storeMarketSnapshot(client, price) {
     try {
-        // Calculate simple volatility metric (would use ATR in production)
-        const volatility = Math.abs(price - (priceHistory[priceHistory.length - 1] || price)) / price;
-
         // Store in market_data table for historical analysis
+        // Using open/high/low/close as the same price for a point-in-time snapshot
         await client.query(`
             INSERT INTO market_data (
                 symbol, 
                 timestamp_utc, 
-                close_price, 
-                spread_pips,
-                volatility_index
-            ) VALUES ($1, NOW(), $2, $3, $4)
+                open,
+                high,
+                low,
+                close,
+                volume,
+                source
+            ) VALUES ($1, NOW(), $2, $2, $2, $2, 0, 'WATCHDOG')
             ON CONFLICT (symbol, timestamp_utc) DO UPDATE 
-            SET close_price = EXCLUDED.close_price,
-                spread_pips = EXCLUDED.spread_pips,
-                volatility_index = EXCLUDED.volatility_index
-        `, ['EURUSD=X', price, 0.00001, volatility]);
-
-        // Maintain price history buffer for volatility calculations
-        priceHistory.push(price);
-        if (priceHistory.length > 100) priceHistory.shift();
+            SET close = EXCLUDED.close,
+                high = GREATEST(market_data.high, EXCLUDED.close),
+                low = LEAST(market_data.low, EXCLUDED.close)
+        `, ['EURUSD=X', price]);
 
     } catch (error) {
         console.warn("⚠️ Market snapshot storage failed:", error.message);
