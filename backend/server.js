@@ -39,7 +39,7 @@ app.get('/health', (req, res) => {
     console.log('[HEALTH] Pulse check received.');
     res.json({
         status: 'ok',
-        system: 'Signal Genius AI Core v1.5',
+        system: 'Signal Genius AI Core v1.8.2',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'production'
     });
