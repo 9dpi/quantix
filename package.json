@@ -19,7 +19,8 @@
     "db:clean": "node scripts/clean_db.js",
     "scheduler": "node scripts/scheduler.js",
     "backtest": "node scripts/backtest-engine.js",
-    "bot": "node backend/bot.js"
+    "bot": "node backend/bot.js",
+    "restore": "node scripts/restore_system.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

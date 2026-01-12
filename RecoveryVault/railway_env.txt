@@ -1,0 +1,36 @@
+# QUANTIX CORE AI - RAILWAY ENVIRONMENT VARIABLES TEMPLATE
+# Copy these to Railway > Project > Variables
+
+# --- Kết nối Database (Supabase / Postgres) ---
+DB_HOST=your-db-host
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=your-password
+DB_PORT=5432
+
+# --- Kết nối Supabase (Realtime & Frontend) ---
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_KEY=your-service-role-key
+
+# --- Kết nối Telegram Bot ---
+TELEGRAM_TOKEN=your-bot-token
+TELEGRAM_CHAT_ID=your-chat-id
+
+# --- Nguồn dữ liệu & AI ---
+ALPHA_VANTAGE_KEY=your-alpha-vantage-key
+GEMINI_API_KEY=your-gemini-key
+
+# --- Chế độ Vận hành v1.8 ---
+SHADOW_MODE=true
+MIN_CONFIDENCE_THRESHOLD=0.85
+SERVICE_TYPE=bot (Chỉ áp dụng cho service chạy bot.js xoay vòng)
+
+# --- Bảo mật & Phân quyền ---
+INTERNAL_AUTH_KEY=chuoi-bao-mat-32-ky-tu-cua-ban
+DASHBOARD_PASSCODE_BASE64=OTExOQ==  # 9119 encoded
+
+# --- Deployment ---
+VITE_APP_URL=https://9dpi.github.io/ai-forecast-demo
+MVP_API_URL=https://your-railway-app-url.railway.app
+PORT=3000

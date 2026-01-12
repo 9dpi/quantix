@@ -1,0 +1,11 @@
+{
+    "notice": "This is a placeholder for your n8n workflows export.",
+    "instructions": [
+        "1. Go to your n8n instance.",
+        "2. Select the workflows related to Quantix (Lead Gen, Stripe Sync, etc.).",
+        "3. Click on the '...' menu and select 'Export'.",
+        "4. Save the resulting JSON file as 'workflows.json' in this folder.",
+        "5. To restore: Create a new n8n instance, go to 'Workflows', and select 'Import from File'."
+    ],
+    "system_version": "Quantix Core AI v1.8"
+}
