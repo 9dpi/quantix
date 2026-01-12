@@ -11,6 +11,7 @@ createRoot(document.getElementById('root')).render(
     <HashRouter>
       <Routes>
         <Route path="/" element={<App />} />
+        <Route path="/admin" element={<App />} />
         <Route path="/mvp" element={<AppMVP />} />
         <Route path="/investment" element={<InvestmentThesis />} />
       </Routes>
