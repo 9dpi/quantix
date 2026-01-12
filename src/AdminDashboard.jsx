@@ -5,10 +5,30 @@ import { supabase } from './supabaseClient';
 // Use standard names to avoid import issues
 const {
     Activity, Server, Database, Shield, Cpu, Terminal,
-    RefreshCw, CheckCircle, XCircle, AlertTriangle, MessageSquare
+    RefreshCw, CheckCircle, XCircle, AlertTriangle, MessageSquare, Lock
 } = Lucide;
 
 export default function AdminDashboard() {
+    // 0. Security Layer
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    const [passcodeInput, setPasscodeInput] = useState('');
+    const [lockError, setLockError] = useState(false);
+
+    const handlePasscode = (e) => {
+        const value = e.target.value;
+        setPasscodeInput(value);
+        if (value === '9119') {
+            setIsAuthorized(true);
+            setLockError(false);
+        } else if (value.length >= 4) {
+            setLockError(true);
+            setTimeout(() => {
+                setPasscodeInput('');
+                setLockError(false);
+            }, 1000);
+        }
+    };
+
     // 1. System Infrastructure Status
     const [systemStatus, setSystemStatus] = useState({
         api: 'checking',
@@ -167,10 +187,11 @@ export default function AdminDashboard() {
         border: '1px solid rgba(255, 255, 255, 0.1)',
         padding: '1.5rem',
         backdropFilter: 'blur(10px)',
-        height: '280px',
+        minHeight: '280px', // Fixed: use minHeight instead of height
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+        height: '100%' // Ensure they fill the grid row
     };
 
     const itemStyle = {
@@ -185,14 +206,59 @@ export default function AdminDashboard() {
         border: '1px solid rgba(255, 255, 255, 0.05)'
     };
 
-    const StatusBadge = ({ status }) => {
-        if (status === 'online') return <span style={{ color: '#4ade80' }}>● Online</span>;
-        if (status === 'offline') return <span style={{ color: '#f87171' }}>● Offline</span>;
-        return <span style={{ color: '#facc15' }}>● Checking</span>;
-    };
+    if (!isAuthorized) {
+        return (
+            <div style={{ minHeight: '100vh', background: '#020617', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Outfit', sans-serif" }}>
+                <div style={{
+                    padding: '3rem',
+                    background: 'rgba(10, 15, 30, 0.8)',
+                    borderRadius: '24px',
+                    border: '1px solid rgba(56, 189, 248, 0.2)',
+                    textAlign: 'center',
+                    backdropFilter: 'blur(20px)',
+                    boxShadow: '0 0 50px rgba(56, 189, 248, 0.1)',
+                    maxWidth: '400px',
+                    width: '90%'
+                }}>
+                    <Shield size={64} color="#38bdf8" style={{ marginBottom: '1.5rem' }} />
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9', marginBottom: '0.5rem' }}>QUANTIX SECURE ACCESS</h1>
+                    <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '2rem' }}>Please enter your authorized 4-digit passcode.</p>
+
+                    <input
+                        type="password"
+                        maxLength={4}
+                        value={passcodeInput}
+                        onChange={handlePasscode}
+                        placeholder="••••"
+                        style={{
+                            width: '100%',
+                            background: 'rgba(0,0,0,0.3)',
+                            border: lockError ? '1px solid #f87171' : '1px solid #1e293b',
+                            borderRadius: '12px',
+                            padding: '1rem',
+                            fontSize: '1.5rem',
+                            color: '#f1f5f9',
+                            textAlign: 'center',
+                            letterSpacing: '1rem',
+                            outline: 'none',
+                            transition: 'all 0.3s'
+                        }}
+                    />
+
+                    {lockError && <p style={{ color: '#f87171', fontSize: '0.75rem', marginTop: '1rem', fontWeight: 600 }}>INVALID ACCESS CODE</p>}
+
+                    <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <Lock size={12} color="#475569" />
+                        <span style={{ fontSize: '0.65rem', color: '#475569', letterSpacing: '1px', textTransform: 'uppercase' }}>Encrypted Node: 0x9119-CORE</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div style={{ minHeight: '100vh', background: '#020617', color: '#f1f5f9', padding: '2.5rem', fontFamily: "'Outfit', sans-serif" }}>
+            ...
 
             {/* Top Bar */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', borderBottom: '1px solid #1e293b', paddingBottom: '1.5rem' }}>
