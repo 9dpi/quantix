@@ -8,24 +8,24 @@ const TRANSLATIONS = {
   en: {
     nav: { features: 'Intelligence', signals: 'Live Signals', pricing: 'Institutional Plans', login: 'Portal Login', logout: 'Logout', vn30: 'Global Assets' },
     hero: {
-      badge: '✨ Quantix AI Core v1.5',
+      badge: '✨ Signal Genius AI Core v1.5',
       title1: 'Institutional Grade',
       title2: 'Market Intelligence',
-      desc: 'Precision-engineered quantitative infrastructure. Scale your intelligence with Quantix AI Core v1.5 - built for mass-personalization and deep tactical execution.',
+      desc: 'Precision-engineered quantitative infrastructure. Scale your intelligence with Signal Genius AI Core v1.5 - built for mass-personalization and deep tactical execution.',
       ctaPrimary: 'Access Portal',
       ctaSecondary: 'View Thesis',
       stats: { accuracy: 'Forecast Precision', watch: 'Continuous Scan', fees: 'Operational ROI' }
     },
     features: {
-      title: 'Why Choose Quantix?',
+      title: 'Why Choose Signal Genius?',
       subtitle: 'State-of-the-art technology for the modern investor.',
       f1: { title: 'Unmatched Efficiency', desc: 'Reduce operational costs by up to 70% through our proprietary Semantic Caching and Hybrid Model routing.' },
       f2: { title: 'Deep Personalization', desc: 'Tailored analysis for thousands of individual portfolios at the cost of a single user. Real-time insights for your specific watchlist.' },
-      f3: { title: 'Real-time Execution', desc: 'Instant signal processing and execution powered by Quantix AI Core v1.5, ensuring you never miss a volatile market opportunity.' }
+      f3: { title: 'Real-time Execution', desc: 'Instant signal processing and execution powered by Signal Genius AI Core v1.5, ensuring you never miss a volatile market opportunity.' }
     },
     signals: {
       lockedTitle: 'Institutional Access Only',
-      lockedDesc: 'Real-time signals and advanced analytics are protected. Login to unlock the full potential of Quantix AI.',
+      lockedDesc: 'Real-time signals and advanced analytics are protected. Login to unlock the full potential of Signal Genius AI.',
       btnUnlock: 'Login to Unlock',
       liveTitle: 'Live Signals - VN30',
       vol: 'Vol',
@@ -61,7 +61,7 @@ const TRANSLATIONS = {
     },
     testimonials: {
       title: 'Trusted by Traders',
-      subtitle: 'See what our community has to say about Quantix AI Forecast.',
+      subtitle: 'See what our community has to say about Signal Genius AI Forecast.',
       t1: { name: 'Alex Nguyen', role: 'Day Trader', content: 'The accuracy is frighteningly good. I recovered my subscription fee in the first trade.' },
       t2: { name: 'Sarah Le', role: 'Office Worker', content: 'I don\'t have time to watch the screen. The automated signals let me trade while I work. Game changer.' },
       t3: { name: 'Michael Tran', role: 'Crypto Investor', content: 'The dark mode UI is beautiful, but the AI algorithms are the real deal. High win rate on VN30.' }
@@ -70,12 +70,12 @@ const TRANSLATIONS = {
 };
 
 const BACKTEST_DATA = [
-  { date: 'Oct 23', quantix: 100, vn30: 100 },
-  { date: 'Nov 23', quantix: 112, vn30: 102 },
-  { date: 'Dec 23', quantix: 125, vn30: 105 },
-  { date: 'Jan 24', quantix: 138, vn30: 108 },
-  { date: 'Feb 24', quantix: 155, vn30: 112 },
-  { date: 'Mar 24', quantix: 172, vn30: 115 },
+  { date: 'Oct 23', Signal Genius: 100, vn30: 100 },
+  { date: 'Nov 23', Signal Genius: 112, vn30: 102 },
+  { date: 'Dec 23', Signal Genius: 125, vn30: 105 },
+  { date: 'Jan 24', Signal Genius: 138, vn30: 108 },
+  { date: 'Feb 24', Signal Genius: 155, vn30: 112 },
+  { date: 'Mar 24', Signal Genius: 172, vn30: 115 },
 ];
 
 function BacktestSection() {
@@ -87,7 +87,7 @@ function BacktestSection() {
             Proof of <span className="text-gradient">Performance</span>
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '800px', margin: '0 auto' }}>
-            Quantix AI Core v1.5 vs. VN30 Index (Backtest Oct 2023 - Mar 2024).
+            Signal Genius AI Core v1.5 vs. VN30 Index (Backtest Oct 2023 - Mar 2024).
             Our algorithms consistently outperform the benchmark by optimizing entry/exit points.
           </p>
         </div>
@@ -96,7 +96,7 @@ function BacktestSection() {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={BACKTEST_DATA}>
               <defs>
-                <linearGradient id="colorQuantix" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="colorSignal Genius" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4} />
                   <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                 </linearGradient>
@@ -112,7 +112,7 @@ function BacktestSection() {
                 }}
                 itemStyle={{ color: 'var(--text-primary)' }}
               />
-              <Area type="monotone" dataKey="quantix" stroke="var(--primary-dark)" strokeWidth={3} fillOpacity={1} fill="url(#colorQuantix)" name="Quantix AI v1.5" />
+              <Area type="monotone" dataKey="Signal Genius" stroke="var(--primary-dark)" strokeWidth={3} fillOpacity={1} fill="url(#colorSignal Genius)" name="Signal Genius AI v1.5" />
               <Area type="monotone" dataKey="vn30" stroke="var(--text-secondary)" strokeWidth={2} fillOpacity={0} name="VN30 Index" />
             </AreaChart>
           </ResponsiveContainer>
@@ -177,7 +177,7 @@ function TooltipIcon({ text }) {
 
 function MarketIntelligence() {
   const briefs = [
-    { title: "Analyzing EUR/USD Liquidity Zones", date: "Jan 11, 2026", desc: "Quantix V1.5 detects shifting order flow in European session open." },
+    { title: "Analyzing EUR/USD Liquidity Zones", date: "Jan 11, 2026", desc: "Signal Genius V1.5 detects shifting order flow in European session open." },
     { title: "Q1 Volatility Outlook", date: "Jan 10, 2026", desc: "Strategic asset allocation based on 10-year historical backtesting results." }
   ];
 
@@ -193,7 +193,7 @@ function MarketIntelligence() {
               <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '700' }}>{b.date}</span>
               <h4 style={{ margin: '1rem 0', fontSize: '1.25rem' }}>{b.title}</h4>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>{b.desc}</p>
-              <div style={{ fontSize: '0.75rem', opacity: 0.5 }}>Analyzed by Quantix AI Core - Data Integrity Verified.</div>
+              <div style={{ fontSize: '0.75rem', opacity: 0.5 }}>Analyzed by Signal Genius AI Core - Data Integrity Verified.</div>
             </div>
           ))}
         </div>
@@ -255,7 +255,7 @@ function Navbar({ t, onLoginClick, isLoggedIn, onLogout }) {
           <Activity className="logo-svg" color="var(--primary)" size={32} />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '1.4rem', fontWeight: '800', fontFamily: 'var(--font-heading)', lineHeight: 1, letterSpacing: '-1px' }}>
-              QUANTIX <span className="text-gradient">AI</span> CORE
+              Signal Genius <span className="text-gradient">AI</span> CORE
             </span>
             <span style={{ fontSize: '0.65rem', fontWeight: '900', color: 'var(--primary)', letterSpacing: '2px', textTransform: 'uppercase' }}>
               Institutional Division
@@ -399,7 +399,7 @@ function PricingCard({ title, price, period, desc, features, t, highlighted = fa
       </div>
 
       <button
-        onClick={() => window.dispatchEvent(new CustomEvent('open-quantix-doc', { detail: { docType: highlighted ? 'Upgrade' : 'FreeTrial' } }))}
+        onClick={() => window.dispatchEvent(new CustomEvent('open-Signal Genius-doc', { detail: { docType: highlighted ? 'Upgrade' : 'FreeTrial' } }))}
         className={highlighted ? 'btn-primary' : ''}
         style={{
           width: '100%',
@@ -726,14 +726,14 @@ function Hero({ t }) {
 
         <div className="hero-cta-row">
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent('open-quantix-doc', { detail: { docType: 'FreeTrial' } }))}
+            onClick={() => window.dispatchEvent(new CustomEvent('open-Signal Genius-doc', { detail: { docType: 'FreeTrial' } }))}
             className="btn-primary"
             style={{ cursor: 'pointer' }}
           >
             {t.hero.ctaPrimary}
           </button>
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent('open-quantix-doc', { detail: { docType: 'ViewDemo' } }))}
+            onClick={() => window.dispatchEvent(new CustomEvent('open-Signal Genius-doc', { detail: { docType: 'ViewDemo' } }))}
             style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '0.75rem 2rem', borderRadius: '99px', cursor: 'pointer', fontWeight: '500', transition: 'all 0.3s' }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'white'; }}
@@ -863,7 +863,7 @@ function App() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = "Quantix AI Forecast";
+    document.title = "Signal Genius AI Forecast";
 
     // Force Dark Theme for Landing Page
     document.documentElement.setAttribute('data-theme', 'dark');
@@ -964,7 +964,7 @@ function App() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
                 <Activity className="logo-svg" color="var(--primary)" size={24} />
-                <span style={{ fontWeight: '800', fontFamily: 'var(--font-heading)', fontSize: '1.4rem', letterSpacing: '-1px' }}>QUANTIX AI CORE</span>
+                <span style={{ fontWeight: '800', fontFamily: 'var(--font-heading)', fontSize: '1.4rem', letterSpacing: '-1px' }}>Signal Genius AI CORE</span>
               </div>
               <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.9rem', maxWidth: '400px' }}>
                 Precision-engineered quantitative infrastructure for strategic alpha generation.
@@ -973,7 +973,7 @@ function App() {
 
             <div style={{ textAlign: 'right', gridColumn: 'span 2' }}>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
-                © 2026 Quantix AI Core. Institutional Division.
+                © 2026 Signal Genius AI Core. Institutional Division.
               </p>
               <p style={{ color: 'var(--primary)', fontSize: '0.75rem', marginTop: '4px', fontWeight: '900', letterSpacing: '1px' }}>
                 DATA INTEGRITY VERIFIED: 100/100 HEALTH SCORE

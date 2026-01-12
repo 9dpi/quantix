@@ -280,26 +280,26 @@ export default function AppMVP() {
 
     useEffect(() => {
         document.title = "Signal Genius AI";
-        const savedTheme = localStorage.getItem('quantix_theme') || 'dark';
+        const savedTheme = localStorage.getItem('Signal Genius_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         setTheme(savedTheme);
 
         // Load Smart Mode preference
-        const savedSmartMode = localStorage.getItem('quantix_smart_mode');
+        const savedSmartMode = localStorage.getItem('Signal Genius_smart_mode');
         if (savedSmartMode !== null) {
             setIsSmartMode(savedSmartMode === 'true');
         }
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('quantix_smart_mode', isSmartMode);
+        localStorage.setItem('Signal Genius_smart_mode', isSmartMode);
     }, [isSmartMode]);
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('quantix_theme', newTheme);
+        localStorage.setItem('Signal Genius_theme', newTheme);
     };
 
     // LOGIC: High-Performance Filtering (Never Static for Irfan)

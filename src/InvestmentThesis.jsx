@@ -21,7 +21,7 @@ const marketData = [
 function InvestmentThesis() {
     useEffect(() => {
         window.scrollTo(0, 0);
-        document.title = "Quantix AI Forecast | Investment Thesis";
+        document.title = "Signal Genius AI Forecast | Investment Thesis";
     }, []);
     const [formData, setFormData] = useState({
         name: '',
@@ -49,7 +49,7 @@ function InvestmentThesis() {
                     company: formData.company,
                     type: formData.type,
                     message: formData.message,
-                    _subject: "New Investment Lead - Quantix AI Forecast"
+                    _subject: "New Investment Lead - Signal Genius AI Forecast"
                 })
             });
             setSubmitted(true);
@@ -61,7 +61,7 @@ function InvestmentThesis() {
     };
 
     const triggerBotForDoc = (docType) => {
-        const event = new CustomEvent('open-quantix-doc', { detail: { docType } });
+        const event = new CustomEvent('open-Signal Genius-doc', { detail: { docType } });
         window.dispatchEvent(event);
     };
 
@@ -72,7 +72,7 @@ function InvestmentThesis() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => window.location.href = '#/'}>
                     <Activity color="var(--primary)" size={28} />
                     <span style={{ fontSize: '1.5rem', fontWeight: '800', fontFamily: 'var(--font-heading)', lineHeight: 1, letterSpacing: '-1px' }}>
-                        QUANTIX <span className="text-gradient">AI</span> CORE
+                        Signal Genius <span className="text-gradient">AI</span> CORE
                     </span>
                 </div>
                 <a href="#/" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontWeight: '500' }}>
@@ -97,7 +97,7 @@ function InvestmentThesis() {
                 </div>
 
                 <h1 style={{ fontSize: '3.5rem', lineHeight: 1.1, marginBottom: '1.5rem', fontWeight: '800' }}>
-                    Quantix AI Core v1.5: The Future of <br />
+                    Signal Genius AI Core v1.5: The Future of <br />
                     <span className="text-gradient">Mass-Personalized Wealth Management</span>
                 </h1>
 
@@ -141,7 +141,7 @@ function InvestmentThesis() {
                         </div>
                         <h3 style={{ fontSize: '1.6rem', marginBottom: '1rem', color: '#FFD700' }}>Scalable Efficiency</h3>
                         <p style={{ color: 'var(--text-muted)', lineHeight: 1.7, fontSize: '1.05rem' }}>
-                            Our proprietary <strong>Semantic Caching</strong> technology allows Quantix v1.5 to serve 10,000+ users with the operational overhead of only 100. We reduce LLM token costs by up to <strong>70%</strong> while maintaining real-time precision.
+                            Our proprietary <strong>Semantic Caching</strong> technology allows Signal Genius v1.5 to serve 10,000+ users with the operational overhead of only 100. We reduce LLM token costs by up to <strong>70%</strong> while maintaining real-time precision.
                         </p>
                     </div>
 
@@ -151,7 +151,7 @@ function InvestmentThesis() {
                         </div>
                         <h3 style={{ fontSize: '1.6rem', marginBottom: '1rem', color: '#00BA88' }}>High-Fidelity Personalization</h3>
                         <p style={{ color: 'var(--text-muted)', lineHeight: 1.7, fontSize: '1.05rem' }}>
-                            Moving beyond generic market signals. Quantix AI Core focuses on the user's specific 'Niche'—providing deep-dive analysis only for the assets that matter to them. <strong>100% relevance, zero noise.</strong>
+                            Moving beyond generic market signals. Signal Genius AI Core focuses on the user's specific 'Niche'—providing deep-dive analysis only for the assets that matter to them. <strong>100% relevance, zero noise.</strong>
                         </p>
                     </div>
 
@@ -210,7 +210,7 @@ function InvestmentThesis() {
                         <Briefcase size={36} color="#00BA88" style={{ marginBottom: '1rem' }} />
                         <h3 style={{ fontSize: '1.3rem', marginBottom: '1rem', color: '#00BA88' }}>Institutional API</h3>
                         <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.6 }}>
-                            Providing the Quantix core to funds or brokerage firms.
+                            Providing the Signal Genius core to funds or brokerage firms.
                         </p>
                         <ul style={{ listStyle: 'none', padding: 0 }}>
                             {['Custom pricing', 'Dedicated infrastructure', 'SLA guarantee', 'Priority support'].map((item, i) => (
@@ -314,7 +314,7 @@ function InvestmentThesis() {
                         {
                             quarter: 'Q3: Multi-Asset Expansion',
                             title: 'Global Scale',
-                            items: ['Scaling Quantix Core to Forex, Crypto, and Global Commodities', 'B2B API Licensing for financial institutions', 'Regional Markets penetration'],
+                            items: ['Scaling Signal Genius Core to Forex, Crypto, and Global Commodities', 'B2B API Licensing for financial institutions', 'Regional Markets penetration'],
                             color: '#00BA88'
                         }
                     ].map((phase, i) => (
@@ -464,8 +464,8 @@ function InvestmentThesis() {
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {/* FormSubmit Configuration */}
                             <input type="hidden" name="_captcha" value="false" />
-                            <input type="hidden" name="_subject" value="🚀 [HOT LEAD] - Quantix Investor Inquiry" />
-                            <input type="hidden" name="_autoresponse" value="Thank you for your interest in Quantix AI Core v1.5. Our team has received your inquiry and will send the Executive Summary and Financial Projections to this email within the next 4 hours." />
+                            <input type="hidden" name="_subject" value="🚀 [HOT LEAD] - Signal Genius Investor Inquiry" />
+                            <input type="hidden" name="_autoresponse" value="Thank you for your interest in Signal Genius AI Core v1.5. Our team has received your inquiry and will send the Executive Summary and Financial Projections to this email within the next 4 hours." />
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
                                 <input
@@ -581,7 +581,7 @@ function InvestmentThesis() {
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
                                 <Activity color="var(--primary)" size={24} />
-                                <span style={{ fontWeight: '800', fontFamily: 'var(--font-heading)', fontSize: '1.4rem', letterSpacing: '-1px' }}>QUANTIX AI CORE</span>
+                                <span style={{ fontWeight: '800', fontFamily: 'var(--font-heading)', fontSize: '1.4rem', letterSpacing: '-1px' }}>Signal Genius AI CORE</span>
                             </div>
                             <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '0.9rem' }}>
                                 Precision-engineered quantitative infrastructure for strategic alpha generation.
@@ -590,7 +590,7 @@ function InvestmentThesis() {
 
                         <div style={{ textAlign: 'right', gridColumn: 'span 2' }}>
                             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
-                                © 2026 Quantix AI Core. Institutional Division.
+                                © 2026 Signal Genius AI Core. Institutional Division.
                             </p>
                             <p style={{ color: 'var(--primary)', fontSize: '0.75rem', marginTop: '4px', fontWeight: '900', letterSpacing: '1px' }}>
                                 DATA INTEGRITY VERIFIED: 100/100 HEALTH SCORE
