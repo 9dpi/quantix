@@ -119,12 +119,13 @@ const SignalBentoCard = memo(({ signal }) => {
 });
 
 // 2. Live Ticker Component: Handles high-frequency updates independently
-const LiveTicker = memo(({ initialPrice }) => {
+const LiveTicker = memo(({ initialPrice, lastUpdate }) => {
     const [data, setData] = useState({
         price: initialPrice || null,
         trend1H: 'BULLISH',
     });
     const [utcTime, setUtcTime] = useState(new Date().toUTCString().split(' ')[4]);
+    const localLastUpdate = lastUpdate ? new Date(lastUpdate).toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' }) : null;
 
     useEffect(() => {
         if (initialPrice) {
@@ -158,17 +159,16 @@ const LiveTicker = memo(({ initialPrice }) => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                         <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase', margin: 0 }}>EUR/USD LIVE</p>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                        <span style={{
-                            fontSize: '1.8rem',
-                            color: 'var(--neon-blue)',
-                            fontWeight: '900',
-                            fontFamily: 'monospace',
-                            lineHeight: 1
-                        }}>
-                            {data.price ? data.price.toFixed(5) : "---"}
-                        </span>
-                        <TrendingUp size={16} color="var(--color-buy)" className="animate-pulse" />
+                    <div className="trend-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <TrendingUp size={14} color="var(--color-buy)" />
+                        HIGH CONVICTION Bullish Trend (H1)
+                    </div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: '950', letterSpacing: '-2px', color: 'var(--text-primary)', margin: '4px 0' }}>
+                        {data.price ? data.price.toFixed(5) : '---'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Activity size={12} className="animate-pulse" />
+                        Live from London ECN {localLastUpdate && `• Last update: ${localLastUpdate} (GMT+7)`}
                     </div>
                 </div>
 
@@ -273,8 +273,9 @@ const SignalList = memo(({ signals, loadingState, totalSignalsCount }) => {
 
 export default function AppMVP() {
     const [signals, setSignals] = useState([]);
-    const [loadingState, setLoadingState] = useState('CONNECTING'); // CONNECTING -> CONNECTED -> READY
     const [currentPrice, setCurrentPrice] = useState(null);
+    const [lastUpdate, setLastUpdate] = useState(null);
+    const [loadingState, setLoadingState] = useState('CONNECTING'); // CONNECTING -> CONNECTED -> READY
     const [theme, setTheme] = useState('dark');
     const [isSmartMode, setIsSmartMode] = useState(true);
 
@@ -353,6 +354,7 @@ export default function AppMVP() {
             if (data && !error && data.length > 0) {
                 const latestSignal = data[0];
                 if (latestSignal.current_price) setCurrentPrice(latestSignal.current_price);
+                if (latestSignal.last_checked_at) setLastUpdate(latestSignal.last_checked_at);
 
                 const realSignals = data.map(d => ({
                     id: d.id,
@@ -393,6 +395,7 @@ export default function AppMVP() {
                 if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
                     const d = payload.new;
                     if (d.current_price) setCurrentPrice(parseFloat(d.current_price));
+                    if (d.last_checked_at) setLastUpdate(d.last_checked_at);
 
                     // Update signals list if the signal is already there, or add if new
                     setSignals(prev => {
@@ -454,7 +457,7 @@ export default function AppMVP() {
             </nav>
 
             <main className="container" style={{ padding: '1rem 0' }}>
-                <LiveTicker initialPrice={currentPrice} />
+                <LiveTicker initialPrice={currentPrice} lastUpdate={lastUpdate} />
 
                 <div className="ticker-container" style={{ margin: '1.5rem auto 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h2 style={{
