@@ -241,7 +241,7 @@ const SignalList = memo(({ signals, loadingState, totalSignalsCount }) => {
                     </div>
                     <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>SYNCHRONIZING CORE...</div>
                     <p className="empty-state-msg">
-                        Quantix AI is establishing a secure tunnel to 10-year data clusters.<br />
+                        Signal Genius AI is establishing a secure tunnel to 10-year data clusters.<br />
                         Integrity verification in progress.
                     </p>
                 </div>
@@ -251,8 +251,8 @@ const SignalList = memo(({ signals, loadingState, totalSignalsCount }) => {
                     <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>WAITING FOR ALIGNMENT...</div>
                     <p className="empty-state-msg">
                         {totalSignalsCount > 0
-                            ? "Quantix is filtering for the best entries. Currently, no signals meet the 70%+ confidence threshold. Stay tuned!"
-                            : "Quantix AI is scanning 6,758+ data points across EUR/USD pairs. Market volatility is currently low. Precision is our priority."}
+                            ? "Signal Genius AI is filtering for the best entries. Currently, no signals meet the strict validation threshold. Stay tuned!"
+                            : "Signal Genius AI is scanning 6,758+ data points across EUR/USD pairs. Market volatility is currently low. Precision is our priority."}
                     </p>
                 </div>
             ) : (
@@ -279,7 +279,7 @@ export default function AppMVP() {
     const [isSmartMode, setIsSmartMode] = useState(true);
 
     useEffect(() => {
-        document.title = "Quantix AI Core";
+        document.title = "Signal Genius AI";
         const savedTheme = localStorage.getItem('quantix_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         setTheme(savedTheme);
@@ -441,7 +441,7 @@ export default function AppMVP() {
             <nav className="glass-panel" style={{ padding: '0.75rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, borderRadius: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => window.location.href = '#/'}>
                     <Activity color="var(--neon-blue)" size={20} />
-                    <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Quantix AI <span style={{ fontSize: '0.7rem', border: '1px solid var(--neon-blue)', padding: '1px 4px', borderRadius: '4px', color: 'var(--neon-blue)' }}>CORE</span></span>
+                    <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Signal Genius <span style={{ fontSize: '0.7rem', border: '1px solid var(--neon-blue)', padding: '1px 4px', borderRadius: '4px', color: 'var(--neon-blue)' }}>AI</span></span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <button onClick={toggleTheme} style={{ background: 'transparent', border: '1px solid var(--border-color)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -483,10 +483,10 @@ export default function AppMVP() {
                         Educational purposes only. Past performance does not guarantee future results.
                     </p>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '0.5rem', fontWeight: '500' }}>
-                        Powered by <span style={{ color: 'var(--neon-blue)' }}>Quantix AI Core v1.5</span>
+                        Powered by <span style={{ color: 'var(--neon-blue)' }}>Signal Genius AI v1.8</span>
                     </p>
                     <p style={{ color: 'var(--text-secondary)', opacity: 0.6, fontSize: '0.65rem', marginTop: '0.4rem' }}>
-                        &copy; 2026 Quantix AI Core. Forensic Market Analysis System.
+                        &copy; 2026 Signal Genius AI. Forensic Market Analysis System.
                     </p>
                 </footer>
             </main>
