@@ -3,12 +3,22 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { askQuantix } from './ai_processor.js';
 import { spawn } from 'child_process';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
 const app = express();
+app.use(helmet()); // Secure HTTP headers
 app.use(cors());
 app.use(express.json());
+
+// Rate limiting: Max 100 requests per 15 mins
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100
+});
+app.use(limiter);
 
 const PORT = process.env.PORT || 3000;
 

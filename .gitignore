@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+database password.txt
 
 # Environment variables (NEVER commit these!)
 .env
