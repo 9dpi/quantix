@@ -1,4 +1,4 @@
-// Signal Genius AI Dashboard - V1.8.8 Premium (Final Optimization)
+// Signal Genius AI Dashboard - V1.8.9 Premium (Production Sync)
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
     Activity, Shield, Cpu, Terminal,
