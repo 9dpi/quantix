@@ -24,9 +24,12 @@ export default function AdminDashboard() {
     const handlePasscode = (e) => {
         const value = e.target.value;
         setPasscodeInput(value);
-        if (value === '9119') {
+
+        // V1.8.1: Obfuscated Check (Base64 for '9119' is 'OTExOQ==')
+        if (btoa(value) === 'OTExOQ==') {
             setIsAuthorized(true);
             setLockError(false);
+            addLog('SUCCESS', 'Authorized access granted. Decrypting node...');
         } else if (value.length >= 4) {
             setLockError(true);
             setTimeout(() => {
@@ -94,10 +97,14 @@ export default function AdminDashboard() {
     };
 
     useEffect(() => {
+        if (!isAuthorized) return; // V1.8.1: Block all side effects until authorized
+
         scrollToBottom();
-    }, [logs]);
+    }, [logs, isAuthorized]);
 
     useEffect(() => {
+        if (!isAuthorized) return; // V1.8.1: Prevent data fetching before login
+
         // Infrastructure Simulation
         const handshake = setTimeout(() => {
             setSystemStatus({ api: 'online', db: 'online', bot: 'online' });
@@ -106,8 +113,7 @@ export default function AdminDashboard() {
 
         const fetchMetrics = async () => {
             if (!supabase) {
-                // If supabase is null, it means initialization failed (missing keys)
-                addLog('ERROR', 'DB Setup Error: VITE_SUPABASE_ANON_KEY is missing in .env');
+                addLog('ERROR', 'DB Setup Error: Supabase client missing');
                 return;
             }
 
