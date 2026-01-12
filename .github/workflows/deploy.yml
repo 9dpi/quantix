@@ -30,12 +30,22 @@ jobs:
         run: npm ci
         
       - name: Build
-        run: npm run build
+        run: |
+          npm run build
+          mkdir -p deployment_root
+          # Copy to root
+          cp -r dist/* deployment_root/
+          # Copy to dashboard subfolder
+          mkdir -p deployment_root/dashboard
+          cp -r dist/* deployment_root/dashboard/
+          # Copy to mvp subfolder
+          mkdir -p deployment_root/mvp
+          cp -r dist/* deployment_root/mvp/
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./deployment_root
 
   deploy:
     environment:
