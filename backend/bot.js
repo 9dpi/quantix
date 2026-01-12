@@ -1,10 +1,10 @@
 /**
- * ⚡ QUANTIX TELEGRAM BOT (GLOBAL EDITION)
+ * ⚡ Signal Genius TELEGRAM BOT (GLOBAL EDITION)
  * Purpose: Automated Market Data & Signals in English
  */
 
 import TelegramBot from 'node-telegram-bot-api';
-import { askQuantix } from './ai_processor.js';
+import { askSignal Genius } from './ai_processor.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -23,7 +23,7 @@ const bot = new TelegramBot(TELEGRAM_TOKEN, {
 });
 
 if (isBotService) {
-    console.log("🤖 Quantix Telegram Bot (English) is ONLINE with Polling...");
+    console.log("🤖 Signal Genius Telegram Bot (English) is ONLINE with Polling...");
 } else {
     console.log("📨 Telegram Messaging Module loaded in Sender-Only mode.");
 }
@@ -34,7 +34,7 @@ if (isBotService) {
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const welcomeMessage = `
-🤖 **Quantix Market Monitor (V1.5)**
+🤖 **Signal Genius Market Monitor (V1.5)**
 
 Welcome! I am your automated EUR/USD market surveillance bot.
 
@@ -46,7 +46,7 @@ Welcome! I am your automated EUR/USD market surveillance bot.
 **How to use:**
 Simply send any message or use the \`/status\` command to receive the latest market report.
 
-*Powered by Quantix AI Core*
+*Powered by Signal Genius AI Core*
     `;
 
     bot.sendMessage(chatId, welcomeMessage, { parse_mode: 'Markdown' });
@@ -59,7 +59,7 @@ bot.onText(/\/status/, async (msg) => {
     const chatId = msg.chat.id;
     bot.sendChatAction(chatId, 'typing');
     try {
-        const response = await askQuantix();
+        const response = await askSignal Genius();
         bot.sendMessage(chatId, response, { parse_mode: 'Markdown' });
     } catch (e) {
         bot.sendMessage(chatId, "⚠️ Error retrieving market data.");
@@ -119,7 +119,7 @@ bot.onText(/\/stats/, async (msg) => {
         });
 
         const msgStats = `
-🏆 **QUANTIX PERFORMANCE HUB**
+🏆 **Signal Genius PERFORMANCE HUB**
 
 📊 **Total Signals:** ${total}
 ✅ **Wins:** ${wins}
@@ -161,10 +161,10 @@ bot.on('message', async (msg) => {
             // 🔎 SECRET MODE: Process with AI
             const question = userMessage.substring(1).trim();
             console.log(`🕵️‍♂️ Secret Chat Triggered: ${question}`);
-            response = await askQuantix(question);
+            response = await askSignal Genius(question);
         } else {
             // 📊 PUBLIC MODE: Just give the report
-            response = await askQuantix(); // Calls without args
+            response = await askSignal Genius(); // Calls without args
         }
 
         bot.sendMessage(chatId, response, { parse_mode: 'Markdown' });

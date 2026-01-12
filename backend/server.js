@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { askQuantix } from './ai_processor.js';
+import { askSignal Genius } from './ai_processor.js';
 import { spawn } from 'child_process';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -26,7 +26,7 @@ const PORT = process.env.PORT || 3000;
 app.post('/api/chat', async (req, res) => {
     const { message } = req.body;
     try {
-        const response = await askQuantix(message);
+        const response = await askSignal Genius(message);
         res.json({ response });
     } catch (error) {
         console.error("API Error:", error.message);
@@ -39,14 +39,14 @@ app.get('/health', (req, res) => {
     console.log('[HEALTH] Pulse check received.');
     res.json({
         status: 'ok',
-        system: 'Quantix AI Core v1.5',
+        system: 'Signal Genius AI Core v1.5',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'production'
     });
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 QUANTIX WEB SERVER LIVE: http://0.0.0.0:${PORT}`);
+    console.log(`🚀 Signal Genius WEB SERVER LIVE: http://0.0.0.0:${PORT}`);
 });
 
 // NOTE: Bot, Watchdog, and Scheduler are now managed by Railway via Procfile.

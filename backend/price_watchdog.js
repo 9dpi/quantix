@@ -106,29 +106,13 @@ async function getYahooPriceAlt() {
     }
 }
 
-/**
- * Fallback: Lấy giá từ Yahoo Finance
- */
-async function getYahooPrice() {
-    try {
-        const response = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/EURUSD=X?interval=1m&range=1d', { timeout: 5000 });
-        const data = await response.json();
-        const price = data.chart.result[0].meta.regularMarketPrice;
-        console.log(`📊 Yahoo EUR/USD (Fallback): ${price}`);
-        return price;
-    } catch (error) {
-        console.error("❌ Yahoo Fetch Error:", error.message);
-        // Last resort: Return null and skip this cycle
-        return null;
-    }
-}
 
 /**
  * TELEGRAM MESSAGE TEMPLATES
  */
 const TelegramTemplates = {
     newSignal: (signal, entry, sl, tp1, tp2) => `
-🚨 **QUANTIX AI: NEW SIGNAL DETECTED**
+🚨 **SIGNAL GENIUS AI: NEW SIGNAL DETECTED**
 
 💹 **Asset:** EUR/USD (M15)
 📉 **Action:** ${signal.signal_type === 'LONG' ? 'BUY LIMIT' : 'SELL LIMIT'}
@@ -142,7 +126,7 @@ const TelegramTemplates = {
 🧠 **AI Analysis:** Volatility Breakout identified. Institutional flow aligns with H1 trend.
 
 ⏰ _${new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' })} (GMT+7)_
-👉 [Open Live Dashboard](https://9dpi.github.io/quantix/#/mvp)
+👉 [Open Live Dashboard](https://9dpi.github.io/Signal Genius/#/mvp)
 `,
 
     entryHit: (signalType, entry, currentPrice, sl, tp1, tp2) => `
@@ -155,7 +139,7 @@ The order has been filled!
 📍 **Current:** ${currentPrice}
 
 ⏰ _${new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' })} (GMT+7)_
-👉 Monitor on [Dashboard](https://9dpi.github.io/quantix/#/mvp)
+👉 Monitor on [Dashboard](https://9dpi.github.io/Signal Genius/#/mvp)
 `,
 
     tp1Hit: (signalType, entry, tp1, currentPrice) => `
@@ -175,7 +159,7 @@ We just secured the first bag.
 Full profit target achieved.
 📊 **EUR/USD** trade is closed.
 
-🔥 **Quantix AI** strikes again.
+🔥 **Signal Genius AI** strikes again.
 _Wait for the next setup._
 ⏰ _${new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit' })} (GMT+7)_
 `,

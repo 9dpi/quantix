@@ -1,9 +1,9 @@
 /**
- * QUANTIX CORE V1.8 - MULTI-AGENT INTEGRATION WRAPPER
- * This file integrates the Multi-Agent System into existing Quantix Core
+ * Signal Genius CORE V1.8 - MULTI-AGENT INTEGRATION WRAPPER
+ * This file integrates the Multi-Agent System into existing Signal Genius Core
  * 
  * Usage:
- *   import { analyzeSignalWithAgents } from './quantix_core_v1.8.js';
+ *   import { analyzeSignalWithAgents } from './Signal Genius_core_v1.8.js';
  *   const decision = await analyzeSignalWithAgents(marketData);
  *   if (decision.shouldEmitSignal) {
  *       // Send to Telegram
@@ -27,7 +27,7 @@ import { orchestrator } from './agents/orchestrator.js';
  * @returns {Promise<Object>} Decision object
  */
 export async function analyzeSignalWithAgents(marketData) {
-    console.log(`\n[QUANTIX V1.8] Analyzing ${marketData.symbol} with Multi-Agent System...`);
+    console.log(`\n[Signal Genius V1.8] Analyzing ${marketData.symbol} with Multi-Agent System...`);
 
     try {
         const decision = await orchestrator.analyzeAndDecide(marketData);
@@ -64,7 +64,7 @@ export async function analyzeSignalWithAgents(marketData) {
         };
 
     } catch (error) {
-        console.error('[QUANTIX V1.8] Multi-Agent analysis failed:', error);
+        console.error('[Signal Genius V1.8] Multi-Agent analysis failed:', error);
 
         // Fallback: reject signal on error
         return {
@@ -89,7 +89,7 @@ export function getSystemStats() {
  * Use with caution!
  */
 export function disableShadowMode() {
-    console.warn('[QUANTIX V1.8] ⚠️  Shadow Mode manually disabled!');
+    console.warn('[Signal Genius V1.8] ⚠️  Shadow Mode manually disabled!');
     orchestrator.disableShadowMode();
 }
 
@@ -103,7 +103,7 @@ export function formatTelegramMessage(signal, agentDecision) {
 
     if (!agentConsensus) {
         return `
-${isGolden ? '🚨 **GOLDEN SIGNAL DETECTED** (85%+ CONFIDENCE)' : '🎯 **QUANTIX AI SIGNAL** (V1.8)'}
+${isGolden ? '🚨 **GOLDEN SIGNAL DETECTED** (85%+ CONFIDENCE)' : '🎯 **Signal Genius AI SIGNAL** (V1.8)'}
 
 📊 **${signal.pair}** | ${signal.action}
 💰 Entry: ${signal.entry}
@@ -112,7 +112,7 @@ ${isGolden ? '🚨 **GOLDEN SIGNAL DETECTED** (85%+ CONFIDENCE)' : '🎯 **QUANT
 
 🧠 **AI Confidence**: ${confidence}%
 
-⚡ Powered by Quantix AI Core V1.8
+⚡ Powered by Signal Genius AI Core V1.8
 `;
     }
 
@@ -123,7 +123,7 @@ ${isGolden ? '🚨 **GOLDEN SIGNAL DETECTED** (85%+ CONFIDENCE)' : '🎯 **QUANT
 
     // Enhanced message with Multi-Agent consensus
     return `
-${isGolden ? '🚨 **GOLDEN SIGNAL DETECTED** (85%+ CONFIDENCE)' : '🎯 **QUANTIX AI SIGNAL** (V1.8 Evolution)'}
+${isGolden ? '🚨 **GOLDEN SIGNAL DETECTED** (85%+ CONFIDENCE)' : '🎯 **Signal Genius AI SIGNAL** (V1.8 Evolution)'}
 
 💹 **Asset**: ${signal.pair} | 📈 **Action**: ${signal.action} @ ${signal.entry}
 
@@ -136,7 +136,7 @@ ${isGolden ? '🚨 **GOLDEN SIGNAL DETECTED** (85%+ CONFIDENCE)' : '🎯 **QUANT
 
 ${shadowMode ? `🛡️  **Shadow Mode Active**: Filtering for highest-confidence setups.` : ''}
 
-⚡ Powered by Quantix AI Core V1.8 | Multi-Agent System
+⚡ Powered by Signal Genius AI Core V1.8 | Multi-Agent System
 `;
 }
 
@@ -144,7 +144,7 @@ ${shadowMode ? `🛡️  **Shadow Mode Active**: Filtering for highest-confidenc
  * Health check function for post-deployment verification
  */
 export async function healthCheck() {
-    console.log('\n🏥 QUANTIX V1.8 HEALTH CHECK\n');
+    console.log('\n🏥 Signal Genius V1.8 HEALTH CHECK\n');
     console.log('─'.repeat(50));
 
     const stats = getSystemStats();
@@ -166,4 +166,4 @@ export async function healthCheck() {
 }
 
 // Auto-run health check on module load
-console.log('[QUANTIX V1.8] Multi-Agent Integration Wrapper loaded ✅');
+console.log('[Signal Genius V1.8] Multi-Agent Integration Wrapper loaded ✅');

@@ -1,5 +1,5 @@
 /**
- * ⚡ QUANTIX AI PROCESSOR (V3.1 STABLE - MULTILINGUAL)
+ * ⚡ Signal Genius AI PROCESSOR (V3.1 STABLE - MULTILINGUAL)
  * Features: Deep AI Conversation + Reliable Data Fallback
  */
 
@@ -56,7 +56,7 @@ function generateRawReport(market, signal) {
 /**
  * Main Hybrid Processor
  */
-export async function askQuantix(userQuestion) {
+export async function askSignal Genius(userQuestion) {
     const client = await pool.connect();
     let marketData = null;
     let signalData = null;
@@ -82,7 +82,7 @@ export async function askQuantix(userQuestion) {
         /* 
         const contextSummary = `Price: ${marketData?.close}, Signal: ${signalData?.signal_type}, Conf: ${signalData?.confidence_score}%`;
         const prompt = `
-            You are Quantix AI, the "Soul" of this Quant Trading system. 
+            You are Signal Genius AI, the "Soul" of this Quant Trading system. 
             
             **CURRENT CONTEXT:**
             - Market: EUR/USD

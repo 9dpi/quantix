@@ -1,7 +1,7 @@
 import yahooFinance from 'yahoo-finance2';
 import dotenv from 'dotenv';
 import pg from 'pg';
-import { analyzeSignalWithAgents } from './quantix_core_v1.8.js';
+import { analyzeSignalWithAgents } from './Signal Genius_core_v1.8.js';
 import { broadcastGoldenSignal } from './telegram_autopilot.js';
 
 dotenv.config();
@@ -135,7 +135,7 @@ async function saveSignalToDB(signal, agentDecision) {
 }
 
 async function runScanner() {
-    console.log("🚀 QUANTIX V1.8 INSTITUTIONAL SCANNER ONLINE...");
+    console.log("🚀 Signal Genius V1.8 INSTITUTIONAL SCANNER ONLINE...");
 
     // First run immediately
     await scanAll();

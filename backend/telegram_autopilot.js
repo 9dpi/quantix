@@ -1,5 +1,5 @@
 /**
- * QUANTIX V1.8 - TELEGRAM AUTOPILOT ENGINE
+ * Signal Genius V1.8 - TELEGRAM AUTOPILOT ENGINE
  * Event-driven & Scheduled messaging system for intelligent community engagement
  */
 
@@ -39,7 +39,7 @@ export async function broadcastGoldenSignal(signalData) {
 
 🛡️ **Shadow Mode Active**: Only highest-confidence setups.
 
-⚡ Powered by Quantix AI Core V1.8 | Multi-Agent System
+⚡ Powered by Signal Genius AI Core V1.8 | Multi-Agent System
     `;
 
     await sendSystemMessage(message);
@@ -73,7 +73,7 @@ export async function broadcastGuardianReport() {
         }
 
         const message = `
-🛡️ **QUANTIX GUARDIAN REPORT**
+🛡️ **Signal Genius GUARDIAN REPORT**
 
 Market is currently showing "Low Quality" setups. Iron Hand has rejected **${rejectedCount}** signals in the last 3 hours to protect your balance.
 
@@ -96,7 +96,7 @@ export async function broadcastMarketPulse() {
     const message = `
 ☀️ **GOOD MORNING - MARKET PULSE**
 
-Quantix AI Council is scanning liquidity zones and sentiment indicators for today's opportunities.
+Signal Genius AI Council is scanning liquidity zones and sentiment indicators for today's opportunities.
 
 🔍 **Focus Areas**:
 • EUR/USD: Monitoring key support at 1.1630
