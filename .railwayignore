@@ -1,32 +1,13 @@
-# Development files
 node_modules/
 .git/
 .github/
 dist/
 build/
-
-# Local environment
 .env.local
 .env.development
-
-# IDE
 .vscode/
 .idea/
-
-# Logs
 *.log
 logs/
-
-# Test files
 *.test.js
 __tests__/
-
-# Documentation
-README.md
-docs/
-
-# Frontend source (not needed on backend server)
-src/
-public/
-index.html
-vite.config.js
