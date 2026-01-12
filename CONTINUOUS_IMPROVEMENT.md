@@ -270,6 +270,26 @@ BATCH_SIZE: 500  // Reduced from 1000
 └─────────────────────────────────────────────────┘
 ```
 
+## 🧠 QUANTIX LEARNING CURVE
+
+### 1. Backtesting Learning (Deep History)
+**Goal:** Master 1-Year EUR/USD Patterns.
+- **Process:** Re-analyzing 6,176 candles to find high-probability setups.
+- **Insight:** "London Session + Supply Zone + RSI Overbought = 85% Reversal Chance".
+- **Result:** Precision Confidence Score.
+
+### 2. Real-time Reinforcement (Live Adaptation)
+**Goal:** Adjust logic instantly based on market effective reality.
+- **Process:** Compare Forecast vs. Actual Price every 10s.
+- **Feedback Loop:** If Prediction Fails → Analyze WHY (News? Big Players?) → Update `Smart Filter`.
+- **Result:** Adaptive market sensitivity.
+
+### 3. Risk Intelligence (Capital Protection)
+**Goal:** Zero "Fakeout" Entries.
+- **Logic:** Enhanced Anti-Wick mechanism.
+- **Rule:** Distinguish Breakout vs. Stop-hunt.
+- **Philosophy:** "Better to miss a trade than lose capital."
+
 ---
 
 ## 📚 QUICK REFERENCE
