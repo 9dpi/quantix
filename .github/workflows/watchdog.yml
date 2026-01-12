@@ -1,7 +1,9 @@
 name: AI Price Watchdog (Manual Control)
 
 on:
-  workflow_dispatch: # Chỉ chạy khi anh bấm nút "Run workflow" thủ công
+  workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
   watchdog:
