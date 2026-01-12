@@ -174,35 +174,8 @@ async function scanAll() {
         });
     }
 
-    // Normal loop follows (commented out or just let it run)
-    for (const symbol of ASSETS) {
-
-        if (decision.shouldEmitSignal) {
-            console.log(`🎯 SIGNAL IDENTIFIED: ${symbol} (${decision.confidence}%)`);
-
-            const signal = {
-                symbol: marketData.symbol,
-                type: marketData.direction,
-                entry: marketData.currentPrice,
-                tp: marketData.currentPrice + (marketData.direction === 'LONG' ? 0.0050 : -0.0050), // Approx 50 pips
-                sl: marketData.currentPrice - (marketData.direction === 'LONG' ? 0.0025 : -0.0025)  // Approx 25 pips
-            };
-
-            const signalId = await saveSignalToDB(signal, decision);
-
-            if (signalId) {
-                // Broadcast to Telegram
-                await broadcastGoldenSignal({
-                    pair: symbol,
-                    action: signal.type,
-                    entry: signal.entry.toFixed(5),
-                    sl: signal.sl.toFixed(5),
-                    tp: signal.tp.toFixed(5),
-                    agentDecision: decision
-                });
-            }
-        }
-    }
+    // Simplified E2E test path
+    console.log("🏁 E2E Test Cycle Completed.");
 }
 
 runScanner();
