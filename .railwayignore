@@ -1,13 +1,22 @@
-node_modules/
+# Development files
 .git/
 .github/
-dist/
-build/
+
+# Local environment
 .env.local
 .env.development
+
+# IDE
 .vscode/
 .idea/
+
+# Logs
 *.log
 logs/
+
+# Test files
 *.test.js
 __tests__/
+
+# Documentation
+docs/
