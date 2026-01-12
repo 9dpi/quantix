@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { LineChart, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { Shield, Globe, Zap, Lock, ChevronRight, Activity, TrendingUp, X, User, LogOut, Check, Star, Briefcase, Cpu, Radio, Menu, CheckCircle, Moon, Sun } from 'lucide-react';
 import InvestorConcierge from './components/InvestorConcierge';
+import AdminDashboard from './AdminDashboard'; // Import Dashboard
 
 const TRANSLATIONS = {
   en: {
@@ -865,10 +866,34 @@ function App() {
 
     // Force Dark Theme for Landing Page
     document.documentElement.setAttribute('data-theme', 'dark');
+
+    // Routing Logic
+    const handleRoute = () => {
+      const hash = window.location.hash;
+      const path = window.location.pathname;
+
+      // If path contains 'dashboard' or hash is '#/admin', show admin
+      if (path.includes('dashboard') || hash === '#/admin') {
+        setPage('admin');
+      } else {
+        setPage('home');
+      }
+    };
+
+    window.addEventListener('hashchange', handleRoute);
+    handleRoute(); // Check on mount
+
+    return () => window.removeEventListener('hashchange', handleRoute);
   }, []);
+
+  const [page, setPage] = useState('home');
 
 
   const t = TRANSLATIONS.en;
+
+  if (page === 'admin') {
+    return <AdminDashboard />;
+  }
 
   return (
     <div style={{ fontFamily: "'Outfit', sans-serif" }}>
