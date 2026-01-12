@@ -16,9 +16,17 @@ if (!TELEGRAM_TOKEN) {
     process.exit(1);
 }
 
-const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
+const isBotService = process.argv.some(arg => arg.includes('bot.js')) || process.env.SERVICE_TYPE === 'bot';
 
-console.log("🤖 Quantix Telegram Bot (English) is ONLINE...");
+const bot = new TelegramBot(TELEGRAM_TOKEN, {
+    polling: isBotService
+});
+
+if (isBotService) {
+    console.log("🤖 Quantix Telegram Bot (English) is ONLINE with Polling...");
+} else {
+    console.log("📨 Telegram Messaging Module loaded in Sender-Only mode.");
+}
 
 /**
  * Command: /start
