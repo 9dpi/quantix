@@ -42,29 +42,60 @@ export async function receiveSignal(req, res) {
         const signal = req.body;
 
         // Validate required fields
-        if (!signal.signal_id || !signal.pair || !signal.type || !signal.entry_price) {
+        if (!signal.signal_id || !signal.pair || !signal.type) {
             console.error('❌ Invalid signal format:', signal);
             return res.status(400).json({
                 error: 'Invalid signal format',
-                required: ['signal_id', 'pair', 'type', 'entry_price']
+                required: ['signal_id', 'pair', 'type']
             });
         }
 
-        console.log(`📥 Received signal ${signal.signal_id} for ${signal.pair} ${signal.type}`);
+        // FALLBACK MECHANISM: If entry_price is missing, fetch current market price
+        let entryPrice = signal.entry_price;
+        if (!entryPrice || entryPrice === null || entryPrice === 0) {
+            console.warn(`⚠️ Missing entry_price for ${signal.pair}. Fetching current market price as fallback...`);
+
+            try {
+                // Fetch current price from Yahoo Finance
+                const yahooSymbol = signal.pair.replace('/', '') + '=X';
+                const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1m&range=1d`);
+                const data = await response.json();
+
+                if (data?.chart?.result?.[0]?.meta?.regularMarketPrice) {
+                    entryPrice = data.chart.result[0].meta.regularMarketPrice;
+                    console.log(`✅ Fallback entry_price fetched: ${entryPrice}`);
+                } else {
+                    console.error('❌ Failed to fetch fallback price. Rejecting signal.');
+                    return res.status(400).json({
+                        error: 'Missing entry_price and fallback fetch failed',
+                        signal_id: signal.signal_id
+                    });
+                }
+            } catch (fetchError) {
+                console.error('❌ Fallback price fetch error:', fetchError.message);
+                return res.status(400).json({
+                    error: 'Missing entry_price and fallback fetch failed',
+                    signal_id: signal.signal_id
+                });
+            }
+        }
+
+        console.log(`📥 Received signal ${signal.signal_id} for ${signal.pair} ${signal.type} @ ${entryPrice}`);
 
         // Transform signal to database schema
         const dbSignal = {
             id: signal.signal_id,
             symbol: signal.pair.replace('/', '') + '=X', // EUR/USD -> EURUSD=X
             timestamp_utc: signal.timestamp,
-            predicted_close: signal.entry_price,
+            predicted_close: entryPrice,
             confidence_score: signal.confidence_score,
             signal_type: signal.type === 'BUY' ? 'LONG' : 'SHORT',
             signal_status: signal.status || 'WAITING',
+            entry_price: entryPrice, // Ensure entry_price is always set
             sl_price: signal.sl,
             tp1_price: signal.metadata?.tp1_price || signal.tp,
             tp2_price: signal.metadata?.tp2_price || signal.tp,
-            current_price: signal.entry_price, // Initial price
+            current_price: entryPrice, // Initial price
             model_version: signal.version,
             is_published: true,
             created_at: signal.timestamp
