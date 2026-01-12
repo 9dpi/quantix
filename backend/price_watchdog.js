@@ -74,6 +74,7 @@ async function fetchAlphaVantagePriceRaw() {
  * Nguồn giá thô từ Yahoo Finance
  */
 async function getYahooPrice() {
+    throw new Error("E2E FAIL-SAFE TEST: Primary Feed Offline"); // FORCED FOR TEST
     try {
         const ts = Date.now();
         const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/EURUSD=X?interval=1m&range=1d&_=${ts}`, {

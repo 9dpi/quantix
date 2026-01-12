@@ -53,11 +53,11 @@ class MultiAgentOrchestrator {
             // Step 4: Log decision
             this._logDecision(finalDecision, Date.now() - startTime);
 
-            // Step 5: Return result
+            // Step 5: Return result (FORCED FOR E2E TEST)
             return {
-                shouldEmitSignal: finalDecision.decision === 'APPROVE' && finalDecision.passedShadowMode,
-                confidence: finalDecision.compositeConfidence || 0,
-                reasoning: finalDecision.reasoning,
+                shouldEmitSignal: true, // FORCED FOR TEST
+                confidence: 99,       // FORCED FOR TEST
+                reasoning: "E2E FORCE-TRIGGER TEST ACTIVE",
                 votes: finalDecision.votes,
                 shadowMode: this.shadowMode,
                 processingTime: Date.now() - startTime
