@@ -222,67 +222,35 @@ export default function MvpDashboard() {
                         </div>
                     </div>
                 </div>
+
+                {/* Compact Neural Pipeline - Center (Desktop Only) */}
+                {!isMobile && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '5px 20px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ opacity: pipelinePulse >= 1 ? 1 : 0.3, transition: '0.5s' }}><Globe size={16} color="#38bdf8" /></div>
+                        <div style={{ width: '30px', height: '1px', background: 'rgba(255,255,255,0.1)', position: 'relative' }}>
+                            {pipelinePulse === 1 && <div style={{ position: 'absolute', height: '2px', width: '10px', background: '#38bdf8', borderRadius: '1px', animation: 'dataScan 1s infinite' }} />}
+                        </div>
+                        <div style={{
+                            width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #38bdf8',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            boxShadow: pipelinePulse === 2 ? '0 0 15px #38bdf8' : 'none',
+                            animation: pipelinePulse === 2 ? 'neuralPulse 2s infinite' : 'none'
+                        }}>
+                            <Cpu size={16} color="#38bdf8" />
+                        </div>
+                        <div style={{ width: '30px', height: '1px', background: 'rgba(255,255,255,0.1)', position: 'relative' }}>
+                            {pipelinePulse === 2 && <div style={{ position: 'absolute', height: '2px', width: '10px', background: '#38bdf8', borderRadius: '1px', animation: 'dataScan 1s infinite' }} />}
+                        </div>
+                        <div style={{ opacity: pipelinePulse >= 3 || pipelinePulse === 0 ? 1 : 0.3, transition: '0.5s' }}><ChartIcon size={16} color="#4ade80" /></div>
+                    </div>
+                )}
+
                 <div style={{ fontSize: isMobile ? '0.6rem' : '0.7rem', color: '#4ade80', textAlign: 'right', whiteSpace: 'nowrap' }}>● UK NOMINAL (42ms)</div>
             </div>
 
             {/* Bento Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '1.25rem' }}>
 
-                {/* Pipeline - Full Width on all screens for impact */}
-                {!isMobile && (
-                    <div style={{ ...cardStyle, gridColumn: '1 / -1', minHeight: '350px' }}>
-                        <h2 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '2rem', display: 'flex', gap: '10px', color: '#38bdf8' }}><Layers size={18} /> Neural Data Pipeline</h2>
-
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: isMobile ? 'column' : 'row',
-                            justifyContent: 'space-around',
-                            alignItems: 'center',
-                            gap: isMobile ? '30px' : '0',
-                            flex: 1
-                        }}>
-                            {/* Box 1 */}
-                            <div style={{ textAlign: 'center', opacity: pipelinePulse >= 1 ? 1 : 0.3, transition: '0.5s', animation: pipelinePulse === 1 ? 'float 2s infinite' : 'none' }}>
-                                <div style={{ width: '60px', height: '60px', borderRadius: '15px', background: 'rgba(56, 189, 248, 0.1)', border: '1px solid #38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
-                                    <Globe size={30} color="#38bdf8" />
-                                </div>
-                                <div style={{ fontSize: '0.7rem', fontWeight: 700 }}>SOURCES</div>
-                            </div>
-
-                            {!isMobile && <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)', position: 'relative' }}>
-                                {pipelinePulse === 1 && <div style={{ position: 'absolute', height: '3px', width: '20px', background: '#38bdf8', borderRadius: '2px', animation: 'dataScan 1s infinite' }} />}
-                            </div>}
-
-                            {/* Core Circle */}
-                            <div style={{ textAlign: 'center', opacity: pipelinePulse >= 2 ? 1 : 0.3, transition: '0.5s' }}>
-                                <div style={{
-                                    width: isMobile ? '100px' : '130px',
-                                    height: isMobile ? '100px' : '130px',
-                                    borderRadius: '50%',
-                                    border: '3px solid #38bdf8',
-                                    boxShadow: pipelinePulse === 2 ? '0 0 30px #38bdf8' : '0 0 10px rgba(56, 189, 248, 0.3)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px',
-                                    animation: pipelinePulse === 2 ? 'neuralPulse 2s infinite' : 'none'
-                                }}>
-                                    <Cpu size={isMobile ? 40 : 60} color="#38bdf8" />
-                                </div>
-                                <div style={{ fontSize: '0.8rem', fontWeight: 900, color: '#38bdf8' }}>QUANTIX CORE</div>
-                            </div>
-
-                            {!isMobile && <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)', position: 'relative' }}>
-                                {pipelinePulse === 2 && <div style={{ position: 'absolute', height: '3px', width: '20px', background: '#38bdf8', borderRadius: '2px', animation: 'dataScan 1s infinite' }} />}
-                            </div>}
-
-                            {/* Box 3 */}
-                            <div style={{ textAlign: 'center', opacity: pipelinePulse >= 3 || pipelinePulse === 0 ? 1 : 0.3, transition: '0.5s' }}>
-                                <div style={{ width: '60px', height: '60px', borderRadius: '15px', background: 'rgba(74, 222, 128, 0.1)', border: '1px solid #4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
-                                    <ChartIcon size={30} color="#4ade80" />
-                                </div>
-                                <div style={{ fontSize: '0.7rem', fontWeight: 700 }}>OUTPUT</div>
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* Grid row 2 */}
                 <div style={{ ...cardStyle }}>
