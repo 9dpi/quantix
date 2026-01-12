@@ -282,20 +282,20 @@ export default function AppMVP() {
     // LOGIC: High-Performance Filtering (Smart Mode)
     const filteredSignals = React.useMemo(() => {
         const sortedSignals = [...signals].sort((a, b) => parseFloat(b.conf || 0) - parseFloat(a.conf || 0));
-        if (!isSmartMode) return sortedSignals.slice(0, 3);
+        if (!isSmartMode) return sortedSignals.slice(0, 5); // Show more in ALL mode
 
         const smartCandidates = sortedSignals.filter(sig => {
             const confidence = parseFloat(sig.conf || 0);
-            const isHighConf = confidence >= 70;
+            const isHighConf = confidence >= 65; // Lowered slightly from 70
             const signalTime = new Date(sig.timestamp).getTime();
             const now = new Date().getTime();
-            const isFresh = (now - signalTime) < (48 * 60 * 60 * 1000);
+            const isFresh = (now - signalTime) < (7 * 24 * 60 * 60 * 1000); // 7 days window
             const isActive = !['SL_HIT', 'TP2_HIT', 'EXPIRED'].includes(sig.status);
 
             return isHighConf && isFresh && isActive;
         });
 
-        return smartCandidates.slice(0, 1);
+        return smartCandidates.slice(0, 2); // Show top 2 instead of 1
     }, [signals, isSmartMode]);
 
     // FETCH REAL DATA

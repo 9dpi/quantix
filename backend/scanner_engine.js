@@ -9,7 +9,7 @@ dotenv.config();
 // --- CONFIGURATION ---
 const ASSETS = ['EURUSD=X', 'BTC-USD', 'AAPL', 'VN30F1M'];
 const TIMEFRAME = '1h';
-const CHECK_INTERVAL = 600000; // 10 minutes (Institutional scan frequency)
+const CHECK_INTERVAL = 120000; // 2 minutes (Increased frequency for demo)
 
 // --- DATABASE SETUP ---
 const { Pool } = pg;
