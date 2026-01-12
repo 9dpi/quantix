@@ -14,7 +14,7 @@ class MultiAgentOrchestrator {
     constructor() {
         this.name = 'ORCHESTRATOR';
         this.shadowMode = true; // Enable shadow mode for first 24h
-        this.shadowModeThreshold = 10; // FOR TESTING: Only emit signals >= 10% confidence
+        this.shadowModeThreshold = 85; // Only emit signals >= 85% confidence
         this.shadowModeStartTime = new Date();
         this.signalHistory = [];
         this.rejectedCounter = 0;
@@ -53,11 +53,11 @@ class MultiAgentOrchestrator {
             // Step 4: Log decision
             this._logDecision(finalDecision, Date.now() - startTime);
 
-            // Step 5: Return result (FORCED FOR E2E TEST)
+            // Step 5: Return result
             return {
-                shouldEmitSignal: true, // FORCED FOR TEST
-                confidence: 99,       // FORCED FOR TEST
-                reasoning: "E2E FORCE-TRIGGER TEST ACTIVE",
+                shouldEmitSignal: finalDecision.decision === 'APPROVE' && finalDecision.passedShadowMode,
+                confidence: finalDecision.compositeConfidence || 0,
+                reasoning: finalDecision.reasoning,
                 votes: finalDecision.votes,
                 shadowMode: this.shadowMode,
                 processingTime: Date.now() - startTime
@@ -113,7 +113,7 @@ class MultiAgentOrchestrator {
         const logEntry = {
             timestamp: new Date().toISOString(),
             decision: decision.decision,
-            confidence: decision.compositeConfidence || 0,
+            confidence: decision.confidence || 0,
             passedShadowMode: decision.passedShadowMode,
             reasoning: decision.reasoning,
             processingTime: `${processingTime}ms`
@@ -238,7 +238,7 @@ Market is currently showing "Low Quality" setups. Iron Hand has rejected **${thi
 
 Our goal today: **Quality over Quantity**. Staying patient for the ${this.shadowModeThreshold}%+ setup.
 
-🟢 System Health: 100% | 🛡️ Shadow Mode: ${this.shadowMode ? 'ACTIVE' : 'OFF'}
+| 🟢 System Health: 100% | 🛡️ Shadow Mode: ${this.shadowMode ? 'ACTIVE' : 'OFF'}
                 `;
                 await sendSystemMessage(msg);
                 this.rejectedCounter = 0; // Reset after report

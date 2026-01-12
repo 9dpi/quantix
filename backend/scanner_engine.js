@@ -8,24 +8,19 @@ dotenv.config();
 
 // --- CONFIGURATION ---
 const ASSETS = ['EURUSD=X', 'BTC-USD', 'AAPL', 'VN30F1M'];
-const TIMEFRAME = '1h';
-const CHECK_INTERVAL = 60000; // 1 minute - High frequency for market tracking
+const SCAN_INTERVAL = 60000; // 60 seconds
 
-// --- DATABASE SETUP ---
-const { Pool } = pg;
-const dbConfig = {
+const pool = new pg.Pool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: parseInt(process.env.DB_PORT || '5432'),
     ssl: { rejectUnauthorized: false }
-};
-const pool = new Pool(dbConfig);
+});
 
 /**
- * ENHANCED: Fetch comprehensive institutional-grade market data
- * Includes: OHLC, Volume, Momentum, and Quality Validation
+ * Fetch historical data + LIVE quote to ensure analysis is on the 'tip' of the market
  */
 async function fetchInstitutionalData(symbol) {
     try {
@@ -53,7 +48,6 @@ async function fetchInstitutionalData(symbol) {
         );
 
         // SYNC: Replace the latest historical close with the LIVE market price
-        // This ensures indicators are calculated on the absolute current moment
         if (validHistory.length > 0) {
             const lastIndex = validHistory.length - 1;
             validHistory[lastIndex].close = livePrice;
@@ -66,18 +60,16 @@ async function fetchInstitutionalData(symbol) {
         const volumes = validHistory.map(h => h.volume || 0);
         const lastCandle = validHistory[validHistory.length - 1];
 
-        // LATENCY DETECTION: Check if the market is actually 'live'
+        // LATENCY DETECTION
         const candleAgeMinutes = (new Date() - new Date(lastCandle.date)) / (1000 * 60);
-        if (candleAgeMinutes > 120) { // 2 hours delay
+        if (candleAgeMinutes > 120) {
             console.warn(`⚠️ [${symbol}] DATA LATENCY DETECTED: Last candle is ${Math.round(candleAgeMinutes)}m old.`);
         }
 
-        // Calculate price momentum (rate of change)
         const momentum = prices.length >= 10
             ? (prices[prices.length - 1] - prices[prices.length - 10]) / prices[prices.length - 10]
             : 0;
 
-        // Calculate volume context
         const avgVolume = volumes.reduce((a, b) => a + b, 0) / volumes.length;
         const volumeRatio = lastCandle.volume / avgVolume;
 
@@ -134,48 +126,54 @@ async function saveSignalToDB(signal, agentDecision) {
     }
 }
 
-async function runScanner() {
-    console.log("🚀 Signal Genius V1.8 INSTITUTIONAL SCANNER ONLINE...");
-
-    // First run immediately
-    await scanAll();
-
-    // Loop
-    setInterval(async () => {
-        await scanAll();
-    }, CHECK_INTERVAL);
-}
-
 async function scanAll() {
     console.log(`\n⏰ [${new Date().toLocaleTimeString()}] Analysis Cycle Starting...`);
 
-    // FORCED E2E TEST: Inject a signal for EURUSD=X
-    const testMarketData = { symbol: 'EURUSD=X', direction: 'LONG', currentPrice: 1.1695 };
-    const testDecision = { shouldEmitSignal: true, confidence: 99, reasoning: 'E2E FORCE-TRIGGER TEST ACTIVE' };
+    for (const symbol of ASSETS) {
+        const marketData = await fetchInstitutionalData(symbol);
+        if (!marketData) continue;
 
-    const testSignal = {
-        symbol: testMarketData.symbol,
-        type: testMarketData.direction,
-        entry: testMarketData.currentPrice,
-        tp: testMarketData.currentPrice + 0.0050,
-        sl: testMarketData.currentPrice - 0.0025
-    };
+        // Perform Multi-Agent Analysis
+        const decision = await analyzeSignalWithAgents(marketData);
 
-    console.log(`🎯 E2E TEST SIGNAL IDENTIFIED: ${testSignal.symbol}`);
-    const testId = await saveSignalToDB(testSignal, testDecision);
-    if (testId) {
-        await broadcastGoldenSignal({
-            pair: testSignal.symbol,
-            action: testSignal.type,
-            entry: testSignal.entry.toFixed(5),
-            sl: testSignal.sl.toFixed(5),
-            tp: testSignal.tp.toFixed(5),
-            agentDecision: testDecision
-        });
+        if (decision.shouldEmitSignal) {
+            console.log(`🎯 SIGNAL IDENTIFIED: ${symbol} (${decision.confidence}%)`);
+
+            const signal = {
+                symbol: marketData.symbol,
+                type: marketData.direction,
+                entry: marketData.currentPrice,
+                tp: marketData.currentPrice + (marketData.direction === 'LONG' ? 0.0050 : -0.0050),
+                sl: marketData.currentPrice - (marketData.direction === 'LONG' ? 0.0025 : -0.0025)
+            };
+
+            const signalId = await saveSignalToDB(signal, decision);
+
+            if (signalId) {
+                // Broadcast to Telegram
+                await broadcastGoldenSignal({
+                    pair: symbol,
+                    action: signal.type,
+                    entry: signal.entry.toFixed(5),
+                    sl: signal.sl.toFixed(5),
+                    tp: signal.tp.toFixed(5),
+                    agentDecision: decision
+                });
+            }
+        }
     }
+}
 
-    // Simplified E2E test path
-    console.log("🏁 E2E Test Cycle Completed.");
+async function runScanner() {
+    console.log("🚀 Institutional AI Scanner v1.8 - ACTIVE");
+    console.log(`📡 Monitoring: ${ASSETS.join(', ')}`);
+    console.log(`⏱️  Interval: ${SCAN_INTERVAL / 1000}s`);
+
+    // Initial scan
+    await scanAll();
+
+    // Schedule scans
+    setInterval(scanAll, SCAN_INTERVAL);
 }
 
 runScanner();
