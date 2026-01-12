@@ -3,7 +3,7 @@
  * This file integrates the Multi-Agent System into existing Signal Genius Core
  * 
  * Usage:
- *   import { analyzeSignalWithAgents } from './Signal Genius_core_v1.8.js';
+ *   import { analyzeSignalWithAgents } from './quantix_core_v1.8.js';
  *   const decision = await analyzeSignalWithAgents(marketData);
  *   if (decision.shouldEmitSignal) {
  *       // Send to Telegram

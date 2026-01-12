@@ -4,7 +4,7 @@
  */
 
 import TelegramBot from 'node-telegram-bot-api';
-import { askSignal Genius } from './ai_processor.js';
+import { askSignalGenius } from './ai_processor.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -59,7 +59,7 @@ bot.onText(/\/status/, async (msg) => {
     const chatId = msg.chat.id;
     bot.sendChatAction(chatId, 'typing');
     try {
-        const response = await askSignal Genius();
+        const response = await askSignalGenius();
         bot.sendMessage(chatId, response, { parse_mode: 'Markdown' });
     } catch (e) {
         bot.sendMessage(chatId, "⚠️ Error retrieving market data.");
@@ -161,10 +161,10 @@ bot.on('message', async (msg) => {
             // 🔎 SECRET MODE: Process with AI
             const question = userMessage.substring(1).trim();
             console.log(`🕵️‍♂️ Secret Chat Triggered: ${question}`);
-            response = await askSignal Genius(question);
+            response = await askSignalGenius(question);
         } else {
             // 📊 PUBLIC MODE: Just give the report
-            response = await askSignal Genius(); // Calls without args
+            response = await askSignalGenius(); // Calls without args
         }
 
         bot.sendMessage(chatId, response, { parse_mode: 'Markdown' });

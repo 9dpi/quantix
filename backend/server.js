@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { askSignal Genius } from './ai_processor.js';
+import { askSignalGenius } from './ai_processor.js';
 import { spawn } from 'child_process';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -26,7 +26,7 @@ const PORT = process.env.PORT || 3000;
 app.post('/api/chat', async (req, res) => {
     const { message } = req.body;
     try {
-        const response = await askSignal Genius(message);
+        const response = await askSignalGenius(message);
         res.json({ response });
     } catch (error) {
         console.error("API Error:", error.message);

@@ -56,7 +56,7 @@ function generateRawReport(market, signal) {
 /**
  * Main Hybrid Processor
  */
-export async function askSignal Genius(userQuestion) {
+export async function askSignalGenius(userQuestion) {
     const client = await pool.connect();
     let marketData = null;
     let signalData = null;
