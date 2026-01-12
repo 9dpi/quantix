@@ -139,6 +139,12 @@ export default function AdminDashboard() {
             }
         };
 
+        // V1.8.2: Initial Handshake Logs
+        setTimeout(() => addLog('CORE', 'Neural Heartbeat: 145bpm | Latency: 42ms'), 500);
+        setTimeout(() => addLog('SHIELD', 'Sentinel Guard: Monitoring institutional supply zones.'), 1000);
+        setTimeout(() => addLog('AI', 'Pattern Recognition Matrix: Loading historical fractal data (10Y)...'), 1500);
+        setTimeout(() => addLog('SUCCESS', 'Quantix Core Ecosystem: SYNC_COMPLETE.'), 2000);
+
         fetchMetrics();
         const dataTimer = setInterval(fetchMetrics, 15000);
 
@@ -178,7 +184,7 @@ export default function AdminDashboard() {
                 sentinel: statuses[Math.floor(Math.random() * 3) + 3],
                 critic: statuses[Math.floor(Math.random() * 2) + 6]
             }));
-        }, 8000);
+        }, 4000);
 
         return () => {
             clearTimeout(handshake);
