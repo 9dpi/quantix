@@ -36,11 +36,17 @@ app.post('/api/chat', async (req, res) => {
 
 // Health Check
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', system: 'Quantix AI Core v1.5' });
+    console.log('[HEALTH] Pulse check received.');
+    res.json({
+        status: 'ok',
+        system: 'Quantix AI Core v1.5',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'production'
+    });
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 API Server running on port ${PORT}`);
+    console.log(`🚀 QUANTIX WEB SERVER LIVE: http://0.0.0.0:${PORT}`);
 });
 
 // NOTE: Bot, Watchdog, and Scheduler are now managed by Railway via Procfile.
