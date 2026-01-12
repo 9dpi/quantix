@@ -1,10 +1,8 @@
-/**
- * QUANTIX V1.8 - TELEGRAM SCHEDULER
- * Automated scheduled messaging using node-cron
- */
-
 import cron from 'node-cron';
+import dotenv from 'dotenv';
 import { broadcastMarketPulse, broadcastGuardianReport, broadcastDailyRecap } from './telegram_autopilot.js';
+
+dotenv.config();
 
 console.log('[SCHEDULER] Initializing Telegram Autopilot Scheduler...');
 
