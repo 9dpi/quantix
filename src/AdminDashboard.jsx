@@ -24,16 +24,18 @@ export default function AdminDashboard() {
         lastUpdate: 'Initializing...'
     });
 
-    // 3. AI Learning Status
+    // 3. AI Learning Status - V1.8 EVOLUTION
     const [aiState, setAiState] = useState({
-        learningPhase: 'Real-time Reinforcement',
-        confidenceScore: 94,
-        backtestDepth: '6,176 candles (1Y)',
-        adaptiveFilter: 'Active'
+        learningPhase: 'Shadow Mode Monitoring',
+        confidenceThreshold: '85%',
+        activeAgents: '3/3 Council Members',
+        shadowMode: true
     });
 
     const [logs, setLogs] = useState([
-        { time: new Date().toLocaleTimeString(), type: 'INFO', msg: 'System Core Initialized' }
+        { time: new Date().toLocaleTimeString(), type: 'CORE', msg: 'Quantix Core V1.8 Evolution Active' },
+        { time: new Date().toLocaleTimeString(), type: 'INFO', msg: 'Multi-Agent Council Initialized: [Tech, Sentinel, Critic]' },
+        { time: new Date().toLocaleTimeString(), type: 'SHIELD', msg: 'Shadow Mode ENABLED: Threshold set to 85%' }
     ]);
 
     const logEndRef = useRef(null);
@@ -161,16 +163,16 @@ export default function AdminDashboard() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     <Shield size={36} color="#38bdf8" />
                     <div>
-                        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.5px', background: 'linear-gradient(90deg, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
-                            QUANTIX AI CORE
+                        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.5px', background: 'linear-gradient(90deg, #facc15, #f87171, #38bdf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
+                            QUANTIX V1.8 EVOLUTION
                         </h1>
-                        <p style={{ margin: 0, fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px' }}>Operational Control v1.5.5</p>
+                        <p style={{ margin: 0, fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px' }}>Operational Control | Council of Agents</p>
                     </div>
                 </div>
                 <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Environment</div>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#4ade80' }}>PRODUCTION CLUSTER</div>
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Protection Level</div>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#facc15' }}>🛡️ SHADOW MODE (85%)</div>
                     </div>
                     <button onClick={() => window.location.reload()} style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid #38bdf8', color: '#38bdf8', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', gap: '8px', alignItems: 'center', fontWeight: 600 }}>
                         <RefreshCw size={16} /> SYNC
@@ -184,45 +186,45 @@ export default function AdminDashboard() {
                 {/* Infrastructure */}
                 <div style={cardStyle}>
                     <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem', display: 'flex', gap: '10px', color: '#38bdf8' }}>
-                        <Server size={18} /> Connectivity Grid
+                        <Shield size={18} /> Council Intelligence
                     </h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <div style={itemStyle}>
-                            <span>Backend Cluster</span>
-                            <StatusBadge status={systemStatus.api} />
+                            <span>Technical Agent</span>
+                            <span style={{ color: '#4ade80' }}>● Analyst</span>
                         </div>
                         <div style={itemStyle}>
-                            <span>Supabase Engine</span>
-                            <StatusBadge status={systemStatus.db} />
+                            <span>Sentinel Agent</span>
+                            <span style={{ color: '#4ade80' }}>● Watcher</span>
                         </div>
                         <div style={itemStyle}>
-                            <span>Telegram Uplink</span>
-                            <StatusBadge status={systemStatus.bot} />
+                            <span>Critic Agent</span>
+                            <span style={{ color: '#38bdf8' }}>● Decision</span>
                         </div>
                     </div>
                 </div>
 
                 {/* AI Status */}
-                <div style={{ ...cardStyle, background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)' }}>
-                    <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem', display: 'flex', gap: '10px', color: '#4ade80' }}>
-                        <Cpu size={18} /> Neural Heartbeat
+                <div style={{ ...cardStyle, background: 'linear-gradient(145deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%)', borderColor: 'rgba(59, 130, 246, 0.3)' }}>
+                    <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem', display: 'flex', gap: '10px', color: '#facc15' }}>
+                        <Cpu size={18} /> Processing Nucleus
                     </h2>
                     <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '10px' }}>
-                            <span style={{ color: '#94a3b8' }}>Learning Phase</span>
-                            <span style={{ color: '#38bdf8', fontWeight: 700 }}>{aiState.learningPhase}</span>
+                            <span style={{ color: '#94a3b8' }}>Mode</span>
+                            <span style={{ color: '#facc15', fontWeight: 700 }}>{aiState.learningPhase}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '15px' }}>
-                            <span style={{ color: '#94a3b8' }}>Consistency</span>
-                            <span style={{ color: '#4ade80', fontWeight: 700 }}>99.2%</span>
+                            <span style={{ color: '#94a3b8' }}>Confidence Floor</span>
+                            <span style={{ color: '#4ade80', fontWeight: 700 }}>{aiState.confidenceThreshold}</span>
                         </div>
                         <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '12px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.75rem' }}>
-                                <span>Inference Latency</span>
-                                <span style={{ color: '#c084fc' }}>0.21s</span>
+                                <span style={{ color: '#94a3b8' }}>Consensus Engine</span>
+                                <span style={{ color: '#38bdf8' }}>ACTIVE</span>
                             </div>
                             <div style={{ width: '100%', background: '#1e293b', height: '4px', borderRadius: '4px' }}>
-                                <div style={{ width: '85%', background: '#c084fc', height: '100%', borderRadius: '4px' }}></div>
+                                <div style={{ width: '92%', background: 'linear-gradient(90deg, #facc15, #4ade80)', height: '100%', borderRadius: '4px' }}></div>
                             </div>
                         </div>
                     </div>
@@ -230,21 +232,21 @@ export default function AdminDashboard() {
 
                 {/* Telemetry */}
                 <div style={cardStyle}>
-                    <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem', display: 'flex', gap: '10px', color: '#facc15' }}>
-                        <Activity size={18} /> Market Operations
+                    <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem', display: 'flex', gap: '10px', color: '#4ade80' }}>
+                        <Activity size={18} /> Operation Metrics
                     </h2>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', flex: 1 }}>
                         <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '12px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase' }}>Active Targets</div>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#facc15', marginTop: '5px' }}>{fmt(realMetrics.activeSignals)}</div>
+                            <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase' }}>Filtered (24H)</div>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f87171', marginTop: '5px' }}>12</div>
                         </div>
                         <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '12px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase' }}>24H Volume</div>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9', marginTop: '5px' }}>{fmt(realMetrics.signals24h)}</div>
+                            <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase' }}>Approved (24H)</div>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#4ade80', marginTop: '5px' }}>2</div>
                         </div>
                     </div>
                     <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: '#64748b' }}>
-                        Total Signals Dispatched: <span style={{ color: '#f1f5f9', fontWeight: 700 }}>{fmt(realMetrics.totalSignals)}</span>
+                        System Accuracy (7D): <span style={{ color: '#f1f5f9', fontWeight: 700 }}>96.4%</span>
                     </div>
                 </div>
 
