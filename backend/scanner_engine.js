@@ -1,7 +1,7 @@
 import yahooFinance from 'yahoo-finance2';
 import dotenv from 'dotenv';
 import pg from 'pg';
-import { analyzeSignalWithAgents } from './quantix_core_v1.8.js';
+import { analyzeSignalWithAgents } from './signal_genius_core_v1.8.js';
 import { broadcastGoldenSignal } from './telegram_autopilot.js';
 
 dotenv.config();
