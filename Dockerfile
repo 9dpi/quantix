@@ -11,7 +11,8 @@ RUN apk add --no-cache \
     python3 \
     make \
     g++ \
-    git
+    git \
+    ca-certificates
 
 # Copy package files
 COPY package*.json ./
