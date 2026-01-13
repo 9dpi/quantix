@@ -187,6 +187,7 @@ class TechnicalAgent {
      * High ratio = potential fakeout
      */
     _calculateWickRatio(candle) {
+        if (!candle || typeof candle !== 'object') return 0;
         const { open, high, low, close } = candle;
         const bodySize = Math.abs(close - open);
         const upperWick = high - Math.max(open, close);

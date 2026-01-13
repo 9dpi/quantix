@@ -23,7 +23,9 @@
     "scheduler": "node scripts/scheduler.js",
     "backtest": "node scripts/backtest-engine.js",
     "bot": "node backend/bot.js",
-    "restore": "node scripts/restore_system.js"
+    "restore": "node scripts/restore_system.js",
+    "start:prod": "node backend/scripts/production_launcher.js",
+    "shadow": "cross-env CORE_SHADOW_MODE=true node backend/scripts/production_launcher.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -52,6 +54,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
