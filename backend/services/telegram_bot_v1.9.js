@@ -346,22 +346,50 @@ ${results.signals.slice(-5).map(s => `${s.result === 'WIN' ? '✅' : '❌'} ${s.
                 });
             }
 
-            // Use last 4 candles from SSOT
-            const last4 = snapshot.last_candle_data;
+            // Calculate data freshness
+            const lastUpdated = new Date(snapshot.last_updated);
+            const ageSeconds = Math.round((Date.now() - lastUpdated.getTime()) / 1000);
 
+            // PRODUCTION_STRICT: Reject stale data
+            if (ageSeconds > 120) {
+                return await botAction('sendMessage', {
+                    chat_id: chatId,
+                    text: `⚠️ Data is stale (${ageSeconds}s old). Scanner may be offline. Please contact admin.`
+                });
+            }
+
+            const freshness = ageSeconds < 60 ? '🟢 LIVE' : '🟡 Fresh';
+
+            // Use REAL data from SSOT - NO MOCK
+            const last4 = snapshot.last_candle_data;
             const { bestMatch, correlation } = findBestMatch(last4);
-            const winRate = (78.5 + (Math.random() * 5)).toFixed(1);
-            const aiScore = snapshot.confidence_score || (88 + Math.random() * 7).toFixed(0);
+
+            // REAL AI Score from database (no fallback to random)
+            const aiScore = snapshot.confidence_score || 'N/A';
+
+            // REAL Win Rate calculation from historical signals
+            let winRate = 'N/A';
+            try {
+                const { data: historicalSignals } = await supabase
+                    .from('ai_signals')
+                    .select('status')
+                    .eq('symbol', 'EURUSD=X')
+                    .in('status', ['TP1_HIT', 'TP2_HIT', 'SL_HIT'])
+                    .limit(100);
+
+                if (historicalSignals && historicalSignals.length > 0) {
+                    const wins = historicalSignals.filter(s => s.status.includes('TP')).length;
+                    winRate = ((wins / historicalSignals.length) * 100).toFixed(1);
+                }
+            } catch (e) {
+                console.error('Failed to calculate real win rate:', e);
+            }
+
             const entry = snapshot.price;
             const isUp = snapshot.ai_status === 'BULLISH' || (bestMatch && bestMatch.results.next_move === 'UP');
 
-            // Calculate how fresh the data is
-            const lastUpdated = new Date(snapshot.last_updated);
-            const ageSeconds = Math.round((Date.now() - lastUpdated.getTime()) / 1000);
-            const freshness = ageSeconds < 60 ? '🟢 LIVE' : ageSeconds < 120 ? '🟡 Fresh' : '🟠 Recent';
-
             const response = `
-💎 **SIGNAL GENIUS VIP v1.9.4**
+💎 **SIGNAL GENIUS VIP v2.0.0**
 ━━━━━━━━━━━━━━━━━━
 📊 **Asset**: \`EUR/USD (Forex)\`
 🎬 **Action**: **${isUp ? '🚀 BUY / LONG' : '🔴 SELL / SHORT'}**
