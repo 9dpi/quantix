@@ -32,8 +32,11 @@ const pool = new pg.Pool({
  * FALLBACK ENGINE: Fetch data from Alpha Vantage when Yahoo fails
  */
 async function fetchFromAlphaVantage(symbol) {
-    const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
-    if (!apiKey) return null;
+    const apiKey = process.env.ALPHA_VANTAGE_API_KEY || process.env.ALPHA_VANTAGE_KEY;
+    if (!apiKey) {
+        console.warn(`[${symbol}] Alpha Vantage Key MISSING check ALPHA_VANTAGE_KEY or ALPHA_VANTAGE_API_KEY`);
+        return null;
+    }
 
     try {
         // Map symbol to AV format
