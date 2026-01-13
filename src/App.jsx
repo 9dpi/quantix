@@ -942,7 +942,7 @@ function App() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = "Signal Genius AI Forecast";
+    document.title = "Quantix Elite AI Forecast";
 
     // Force Dark Theme for Landing Page
     document.documentElement.setAttribute('data-theme', 'dark');
