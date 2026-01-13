@@ -360,10 +360,6 @@ ${results.signals.slice(-5).map(s => `${s.result === 'WIN' ? '✅' : '❌'} ${s.
 
             const freshness = ageSeconds < 60 ? '🟢 LIVE' : '🟡 Fresh';
 
-            // Use REAL data from SSOT - NO MOCK
-            const last4 = snapshot.last_candle_data;
-            const { bestMatch, correlation } = findBestMatch(last4);
-
             // REAL AI Score from database (no fallback to random)
             const aiScore = snapshot.confidence_score || 'N/A';
 
@@ -386,7 +382,11 @@ ${results.signals.slice(-5).map(s => `${s.result === 'WIN' ? '✅' : '❌'} ${s.
             }
 
             const entry = snapshot.price;
-            const isUp = snapshot.ai_status === 'BULLISH' || (bestMatch && bestMatch.results.next_move === 'UP');
+            const isUp = snapshot.ai_status === 'BULLISH';
+
+            // Calculate TP/SL based on standard Forex risk:reward
+            const tpDistance = 0.0035; // 35 pips
+            const slDistance = 0.0025; // 25 pips
 
             const response = `
 💎 **SIGNAL GENIUS VIP v2.0.0**
@@ -396,23 +396,23 @@ ${results.signals.slice(-5).map(s => `${s.result === 'WIN' ? '✅' : '❌'} ${s.
 
 📍 **Execution Zone**:
 - Entry: \`${entry.toFixed(5)}\`
-- TP1: \`${(isUp ? entry + 0.0035 : entry - 0.0035).toFixed(5)}\`
-- SL:  \`${(isUp ? entry - 0.0025 : entry + 0.0025).toFixed(5)}\`
+- TP1: \`${(isUp ? entry + tpDistance : entry - tpDistance).toFixed(5)}\`
+- SL:  \`${(isUp ? entry - slDistance : entry + slDistance).toFixed(5)}\`
 
-🧠 **AI CONFLUENCE**:
-- **Pattern Match**: \`${correlation.toFixed(1)}%\` Correlation
+🧠 **AI ANALYSIS**:
 - **AI Confidence**: \`${aiScore} / 100\`
 - **Historical Win Rate**: \`${winRate}%\`
-- **Patterns Analyzed**: \`7,011\`
+- **Data Source**: \`${snapshot.last_candle_data?.source || 'Alpha Vantage'}\`
+- **Data Quality**: \`${snapshot.data_quality}\`
 
 🕒 **Data Freshness**: ${freshness} (${ageSeconds}s ago)
 
-🛡️ *Powered by Quantix SSOT v1.9.4*
+🛡️ *Powered by Quantix SSOT v2.0.0 - 100% Real Data*
 ━━━━━━━━━━━━━━━━━━
                 `;
 
             const keyboard = {
-                inline_keyboard: [[{ text: '📊 Live Chart', url: 'http://signalgeniusai.com' }]]
+                inline_keyboard: [[{ text: '📊 Live Dashboard', url: 'https://9dpi.github.io/ai-forecast-demo/#/mvp' }]]
             };
 
             await botAction('sendMessage', {
@@ -423,7 +423,7 @@ ${results.signals.slice(-5).map(s => `${s.result === 'WIN' ? '✅' : '❌'} ${s.
             });
         } catch (e) {
             console.error('[VIP ERROR]', e);
-            await botAction('sendMessage', { chat_id: chatId, text: "❌ VIP Core is busy. Please retry." });
+            await botAction('sendMessage', { chat_id: chatId, text: `❌ VIP Core Error: ${e.message}` });
         }
     }
 
