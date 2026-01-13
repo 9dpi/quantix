@@ -30,11 +30,12 @@ async function fetchInstitutionalData(symbol) {
         period1.setDate(period1.getDate() - 60); // Extended to 60 days for robust indicators
         const period2 = new Date();
 
-        const history = await yahooFinance.historical(symbol, {
+        const chartResult = await yahooFinance.chart(symbol, {
             period1,
             period2,
             interval: '1h'
         });
+        const history = chartResult.quotes;
 
         // FAST TRACK: Fetch LIVE quote to override the last candle (Latency Reduction)
         const quote = await yahooFinance.quote(symbol);

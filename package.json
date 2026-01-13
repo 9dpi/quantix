@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.8.9",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "start": "node backend/server.js",
     "dev": "vite",
