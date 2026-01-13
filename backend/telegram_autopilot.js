@@ -1,10 +1,12 @@
 /**
  * Signal Genius V1.9 - TELEGRAM AUTOPILOT ENGINE
  * Event-driven & Scheduled messaging system for intelligent community engagement
+ * VIP MODE: Only 1 signal/day with >95% confidence
  */
 
 import { sendSystemMessage } from './bot.js';
 import { createClient } from '@supabase/supabase-js';
+import { canBroadcastSignal, recordBroadcast } from './telegram_signal_filter.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -15,36 +17,82 @@ const supabase = createClient(
 );
 
 /**
- * 🚨 GOLDEN SIGNAL - High confidence signal with full Council analysis
+ * 🚨 GOLDEN SIGNAL - Professional Trading Signal Format
+ * Matches institutional-grade signal template with full risk management
+ * VIP FILTER: Only broadcasts if confidence >95% and no signal sent today
  */
 export async function broadcastGoldenSignal(signalData) {
-    const { pair, action, entry, sl, tp, agentDecision } = signalData;
-    const { agentConsensus, confidence, reasoning } = agentDecision;
+    const { pair, action, entry, sl, tp, agentDecision, metadata } = signalData;
+    const { confidence } = agentDecision;
 
-    const techReason = agentConsensus?.technical?.reasoning || 'Strong technical alignment detected.';
-    const sentinelReason = agentConsensus?.sentinel?.reasoning || 'Market environment stable.';
+    // VIP QUALITY CONTROL: Check if we can broadcast
+    const canBroadcast = await canBroadcastSignal(confidence);
+    if (!canBroadcast) {
+        console.log(`[AUTOPILOT] 🚫 Signal blocked by VIP filter (Confidence: ${confidence}%)`);
+        return; // Exit without broadcasting
+    }
+
+    // Calculate risk metrics
+    const entryPrice = parseFloat(entry);
+    const slPrice = parseFloat(sl);
+    const tpPrice = parseFloat(tp);
+
+    const pipValue = 0.0001; // For forex pairs
+    const targetPips = Math.abs((tpPrice - entryPrice) / pipValue).toFixed(0);
+    const stopPips = Math.abs((entryPrice - slPrice) / pipValue).toFixed(0);
+    const riskReward = (targetPips / stopPips).toFixed(2);
+
+    // Determine trade direction
+    const tradeType = action === 'BUY' ? 'BUY (Long)' : 'SELL (Short)';
+
+    // Format entry zone (±2 pips from entry)
+    const entryLow = (entryPrice - 2 * pipValue).toFixed(5);
+    const entryHigh = (entryPrice + 2 * pipValue).toFixed(5);
+
+    // Get current UTC time in exact format: "Jan 13, 2026 — 14:45 UTC"
+    const now = new Date();
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[now.getUTCMonth()];
+    const day = now.getUTCDate();
+    const year = now.getUTCFullYear();
+    const hours = String(now.getUTCHours()).padStart(2, '0');
+    const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+    const utcTime = `${month} ${day}, ${year} — ${hours}:${minutes} UTC`;
 
     const message = `
-🚨 **GOLDEN SIGNAL DETECTED** (${confidence}%+ CONFIDENCE)
+📊 Asset: ${pair}
+📌 Trade: ${tradeType}
 
-💹 **Asset**: ${pair}
-📈 **Action**: ${action} @ ${entry}
+📈 Charts:
+* Bias: H1
+* Entry: M5–M15
 
-🧠 **AI Council Verdict**:
-├─ **Tech Agent**: ${techReason}
-├─ **Sentinel Agent**: ${sentinelReason}
-└─ **Critic Agent**: ✅ APPROVED (Consensus: ${confidence}%)
+💰 Price Levels:
+Entry Zone: ${entryLow} – ${entryHigh}
+Take Profit (TP): ${tpPrice.toFixed(5)}
+Stop Loss (SL): ${slPrice.toFixed(5)}
 
-🎯 **TP**: ${tp} | ❌ **SL**: ${sl}
+📏 Risk Management:
+* Target: +${targetPips} pips
+* Stop: −${stopPips} pips
+* Risk:Reward: 1:${riskReward}
+* Suggested Risk: 0.5%–1% per trade
 
-🛡️ **Shadow Mode Active**: Only highest-confidence setups.
+🧠 AI Confidence: ${confidence}% (model conviction score)
+🕒 Trade Type: Intraday
+⏰ Posted: ${utcTime}
 
-⚡ Powered by Quantix Core AI V1.8 | Multi-Agent System
-    `;
+⚠️ Not financial advice. Trade responsibly.
+    `.trim();
 
     await sendSystemMessage(message);
-    console.log(`[AUTOPILOT] Golden Signal broadcasted for ${pair}`);
+
+    // Record this broadcast to prevent duplicates today
+    await recordBroadcast(signalData);
+
+    console.log(`[AUTOPILOT] ✅ VIP Signal broadcasted for ${pair} (${confidence}% confidence)`);
 }
+
 
 /**
  * 🛡️ GUARDIAN REPORT - Periodic safety report (every 3 hours if silent)

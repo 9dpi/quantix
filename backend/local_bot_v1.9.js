@@ -104,44 +104,88 @@ async function handleMessage(msg) {
     // --- 1. Signal Genius VIP (Lệnh: /vip) ---
     if (text === '/vip') {
         try {
-            const history = await yahooFinance.chart('EURUSD=X', { period1: Math.floor(Date.now() / 1000) - (7 * 24 * 3600), interval: '1h' });
-            const quotes = history.quotes.filter(q => q.open);
-            const last4 = quotes.slice(-4).map(q => ({ o: q.open, h: q.high, l: q.low, c: q.close }));
+            // Fetch latest VIP signal from Quantix AI Core (confidence >95%)
+            const result = await pool.query(`
+                SELECT 
+                    symbol,
+                    signal_type,
+                    predicted_close as entry_price,
+                    tp1_price,
+                    sl_price,
+                    confidence_score,
+                    created_at
+                FROM ai_signals 
+                WHERE confidence_score > 95
+                AND is_published = TRUE
+                ORDER BY created_at DESC 
+                LIMIT 1
+            `);
 
-            const { bestMatch, correlation } = findBestMatch(last4);
-            const winRate = (78.5 + (Math.random() * 5)).toFixed(1);
-            const aiScore = (88 + (Math.random() * 7)).toFixed(0);
-            const entry = last4[3].c;
-            const isUp = bestMatch ? bestMatch.results.next_move === 'UP' : true;
+            if (result.rows.length === 0) {
+                await botAction('sendMessage', {
+                    chat_id: chatId,
+                    text: "⏳ No VIP signals available yet. Quantix AI Core is scanning for >95% confidence setups."
+                });
+                return;
+            }
+
+            const signal = result.rows[0];
+            const pair = signal.symbol.replace('=X', '');
+            const action = signal.signal_type === 'LONG' ? 'BUY' : 'SELL';
+            const tradeType = action === 'BUY' ? 'BUY (Long)' : 'SELL (Short)';
+
+            const entry = parseFloat(signal.entry_price);
+            const tp = parseFloat(signal.tp1_price || (entry * (action === 'BUY' ? 1.004 : 0.996)));
+            const sl = parseFloat(signal.sl_price || (entry * (action === 'BUY' ? 0.997 : 1.003)));
+
+            const pipValue = 0.0001;
+            const targetPips = Math.abs((tp - entry) / pipValue).toFixed(0);
+            const stopPips = Math.abs((entry - sl) / pipValue).toFixed(0);
+            const riskReward = (targetPips / stopPips).toFixed(2);
+
+            const entryLow = (entry - 2 * pipValue).toFixed(5);
+            const entryHigh = (entry + 2 * pipValue).toFixed(5);
+
+            // Format timestamp
+            const signalDate = new Date(signal.created_at);
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const month = monthNames[signalDate.getUTCMonth()];
+            const day = signalDate.getUTCDate();
+            const year = signalDate.getUTCFullYear();
+            const hours = String(signalDate.getUTCHours()).padStart(2, '0');
+            const minutes = String(signalDate.getUTCMinutes()).padStart(2, '0');
+            const utcTime = `${month} ${day}, ${year} — ${hours}:${minutes} UTC`;
 
             const response = `
-💎 **SIGNAL GENIUS VIP v1.9**
-━━━━━━━━━━━━━━━━━━
-📊 **Asset**: \`EUR/USD (Forex)\`
-🎬 **Action**: **${isUp ? '🚀 BUY / LONG' : '🔴 SELL / SHORT'}**
+📊 Asset: ${pair}
+📌 Trade: ${tradeType}
 
-📍 **Execution Zone**:
-- Entry: \`${entry.toFixed(5)}\`
-- TP1: \`${(isUp ? entry + 0.0035 : entry - 0.0035).toFixed(5)}\`
-- SL:  \`${(isUp ? entry - 0.0025 : entry + 0.0025).toFixed(5)}\`
+📈 Charts:
+* Bias: H1
+* Entry: M5–M15
 
-🧠 **AI CONFLUENCE**:
-- **Pattern Match**: \`${correlation.toFixed(1)}%\` Correlation
-- **AI Confidence**: \`${aiScore} / 100\`
-- **Historical Win Rate**: \`${winRate}%\`
+💰 Price Levels:
+Entry Zone: ${entryLow} – ${entryHigh}
+Take Profit (TP): ${tp.toFixed(5)}
+Stop Loss (SL): ${sl.toFixed(5)}
 
-🛡️ *Powered by Quantix Iron Hand v1.9*
-━━━━━━━━━━━━━━━━━━
-            `;
+📏 Risk Management:
+* Target: +${targetPips} pips
+* Stop: −${stopPips} pips
+* Risk:Reward: 1:${riskReward}
+* Suggested Risk: 0.5%–1% per trade
+
+🧠 AI Confidence: ${signal.confidence_score}% (model conviction score)
+🕒 Trade Type: Intraday
+⏰ Posted: ${utcTime}
+
+⚠️ Not financial advice. Trade responsibly.
+            `.trim();
 
             const keyboard = {
                 inline_keyboard: [
                     [
-                        { text: '📊 Live Chart', url: 'https://9dpi.github.io/ai-forecast-demo/' },
-                        { text: '🛡️ Risk Calc', callback_data: 'risk_calc' }
-                    ],
-                    [
-                        { text: '⚡ Close Now', callback_data: 'close_now' }
+                        { text: '📊 Live Dashboard', url: 'https://9dpi.github.io/ai-forecast-demo/#/mvp' }
                     ]
                 ]
             };
@@ -149,13 +193,12 @@ async function handleMessage(msg) {
             await botAction('sendMessage', {
                 chat_id: chatId,
                 text: response,
-                parse_mode: 'Markdown',
                 reply_markup: keyboard
             });
 
         } catch (e) {
-            console.error(e);
-            await botAction('sendMessage', { chat_id: chatId, text: "❌ VIP Core is busy analyzing. Please retry." });
+            console.error('[/vip]', e);
+            await botAction('sendMessage', { chat_id: chatId, text: "❌ Error fetching VIP signal. Please try again." });
         }
     }
 
