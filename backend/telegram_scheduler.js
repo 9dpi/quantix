@@ -126,29 +126,46 @@ bot.on('message', async (msg) => {
             const minutes = String(signalDate.getUTCMinutes()).padStart(2, '0');
             const utcTime = `${month} ${day}, ${year} — ${hours}:${minutes} UTC`;
 
+            const tradeAction = action === 'BUY' ? '🟢 BUY (expect price to go up)' : '🔴 SELL (expect price to go down)';
+
+            // Session Detection Logic
+            const hr = signalDate.getUTCHours();
+            let session = "Global Market";
+            if (hr >= 8 && hr < 13) session = "London";
+            else if (hr >= 13 && hr < 16) session = "London → New York Overlap";
+            else if (hr >= 16 && hr < 21) session = "New York";
+            else if (hr >= 22 || hr < 0) session = "Sydney";
+            else if (hr >= 0 && hr < 8) session = "Tokyo";
+
             const response = `
 📊 Asset: ${pair}
-📌 Trade: ${tradeType}
 
-📈 Charts:
-* Bias: H1
-* Entry: M5–M15
+📌 Trade: ${tradeAction}
+
+⏳ Timeframe: 15-Minute (M15)
+🌍 Session: ${session}
 
 💰 Price Levels:
-Entry Zone: ${entryLow} – ${entryHigh}
-Take Profit (TP): ${tp.toFixed(5)}
-Stop Loss (SL): ${sl.toFixed(5)}
+* Entry Zone: ${entryLow} – ${entryHigh}
+* Take Profit (TP): ${tp.toFixed(5)}
+* Stop Loss (SL): ${sl.toFixed(5)}
 
-📏 Risk Management:
+📏 Trade Details:
 * Target: +${targetPips} pips
-* Stop: −${stopPips} pips
-* Risk:Reward: 1:${riskReward}
-* Suggested Risk: 0.5%–1% per trade
+* Risk–Reward: 1 : ${riskReward}
+* Suggested Risk: 0.5% – 1% per trade
 
-🧠 AI Confidence: ${signal.confidence_score}% (model conviction score)
 🕒 Trade Type: Intraday
+🧠 AI Confidence: ${signal.confidence_score}% ⭐
+
 ⏰ Posted: ${utcTime}
 
+⏳ Auto-Expiry Rules:
+* Signal is valid for this session only
+* Expires at New York close or if TP or SL is hit
+* Do not enter if price has already moved significantly beyond the entry zone
+
+—
 ⚠️ Not financial advice. Trade responsibly.
             `.trim();
 
