@@ -12,9 +12,9 @@ import { broadcastMarketPulse, broadcastGuardianReport, broadcastDailyRecap } fr
 dotenv.config();
 
 // --- CONFIGURATION ---
-const TOKEN = process.env.TELEGRAM_TOKEN;
+const TOKEN = process.env.TELEGRAM_DEV_TOKEN || process.env.TELEGRAM_TOKEN;
 if (!TOKEN) {
-    console.error("❌ [CRITICAL] No TELEGRAM_TOKEN found!");
+    console.error("❌ [CRITICAL] No TELEGRAM_TOKEN or TELEGRAM_DEV_TOKEN found!");
     process.exit(1);
 }
 
