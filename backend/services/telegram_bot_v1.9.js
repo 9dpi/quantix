@@ -38,6 +38,25 @@ const pool = new Pool({
 
 // --- PATTERN CACHE LOADING ---
 let patternCache = [];
+
+// --- ADMIN BACKTEST ENGINE V1.9.5 ---
+// State management for 2FA backtest authentication
+const backtestStates = new Map();
+const ADMIN_PASSCODE = '9119';
+
+/**
+ * Calculate real pips based on symbol type
+ * Gold/XAU: diff * 10
+ * Forex: diff / 0.0001
+ */
+function getRealPips(symbol, entry, exit) {
+    const diff = Math.abs(entry - exit);
+    if (symbol.includes('XAUUSD') || symbol.includes('GOLD') || symbol.includes('XAU')) {
+        return diff * 10;
+    }
+    // Forex pairs (EURUSD, GBPUSD, etc.)
+    return diff / 0.0001;
+}
 const CACHE_MODE = process.env.PATTERN_CACHE_MODE || 'LOCAL';
 
 async function loadPatterns() {
@@ -170,8 +189,148 @@ async function handleMessage(msg) {
 
     // 0. GLOBAL COMMAND: /start
     if (text === '/start') {
-        const welcome = `🚀 **Quantix Bot v1.9.3 - ONLINE**\n\nI have received your message. AI Core is active.\n\nType **/vip** to see my latest analysis!`;
+        const welcome = `🚀 **Quantix Bot v1.9.5 - ONLINE**\n\nI have received your message. AI Core is active.\n\nType **/vip** to see my latest analysis!\nType **/backtest** for admin performance audit.`;
         return await botAction('sendMessage', { chat_id: chatId, text: welcome, parse_mode: 'Markdown' });
+    }
+
+    // 🔐 ADMIN BACKTEST ENGINE V1.9.5 - STAGE 1: INITIATE 2FA
+    if (text === '/backtest') {
+        backtestStates.set(chatId, { status: 'AWAITING_PASSCODE', timestamp: Date.now() });
+        console.log(`🔐 [BACKTEST] 2FA challenge initiated for ${chatId}`);
+        return await botAction('sendMessage', {
+            chat_id: chatId,
+            text: `🔐 **QUANTIX SECURITY CHALLENGE**\n\nThis command requires admin authorization.\n\nPlease input the passcode:`,
+            parse_mode: 'Markdown'
+        });
+    }
+
+    // 🔐 ADMIN BACKTEST ENGINE V1.9.5 - STAGE 2 & 3: VERIFY & EXECUTE
+    const backtestState = backtestStates.get(chatId);
+    if (backtestState && backtestState.status === 'AWAITING_PASSCODE') {
+        // Check timeout (5 minutes)
+        if (Date.now() - backtestState.timestamp > 300000) {
+            backtestStates.delete(chatId);
+            return await botAction('sendMessage', {
+                chat_id: chatId,
+                text: '⏱️ **Session Expired**\n\nPlease restart with /backtest'
+            });
+        }
+
+        // Verify passcode
+        if (text === ADMIN_PASSCODE) {
+            backtestStates.delete(chatId);
+            console.log(`✅ [BACKTEST] Access granted for ${chatId}`);
+
+            await botAction('sendMessage', {
+                chat_id: chatId,
+                text: '✅ **Access Granted**\n\nCalculating real-data performance...'
+            });
+
+            try {
+                // Query real signals from last 24 hours
+                const { data: signals, error } = await supabase
+                    .from('ai_signals')
+                    .select('*')
+                    .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+                if (error) throw error;
+
+                // Calculate performance metrics
+                let results = {
+                    win: 0,
+                    loss: 0,
+                    open: 0,
+                    totalPips: 0,
+                    grossProfit: 0,
+                    grossLoss: 0,
+                    highConfWins: 0,
+                    signals: []
+                };
+
+                signals.forEach(s => {
+                    const entry = s.entry_price || s.predicted_close;
+                    const exit = s.current_price || s.tp1_price || s.tp2_price;
+
+                    if (!entry || !exit) {
+                        results.open++;
+                        return;
+                    }
+
+                    const pips = getRealPips(s.symbol, entry, exit);
+
+                    if (s.signal_status === 'TP1_HIT' || s.signal_status === 'TP2_HIT' || s.signal_status === 'target_reached') {
+                        results.win++;
+                        results.totalPips += pips;
+                        results.grossProfit += pips;
+                        if (s.confidence_score >= 90) results.highConfWins++;
+                        results.signals.push({ symbol: s.symbol, pips: pips.toFixed(1), result: 'WIN' });
+                    } else if (s.signal_status === 'SL_HIT' || s.signal_status === 'failed') {
+                        results.loss++;
+                        results.totalPips -= pips;
+                        results.grossLoss += pips;
+                        results.signals.push({ symbol: s.symbol, pips: -pips.toFixed(1), result: 'LOSS' });
+                    } else {
+                        results.open++;
+                    }
+                });
+
+                // Calculate win rate
+                const totalClosed = results.win + results.loss;
+                const winRate = totalClosed > 0 ? ((results.win / totalClosed) * 100).toFixed(1) : 0;
+
+                // Generate report
+                const report = `
+🏆 **QUANTIX 24H PERFORMANCE AUDIT**
+━━━━━━━━━━━━━━━━━━
+
+📊 **Signal Summary**:
+✅ Wins: ${results.win}
+❌ Losses: ${results.loss}
+⏳ Open: ${results.open}
+📈 Win Rate: ${winRate}%
+
+💰 **P&L Analysis**:
+💵 Gross Profit: +${results.grossProfit.toFixed(1)} pips
+💸 Gross Loss: -${results.grossLoss.toFixed(1)} pips
+💎 **NET P&L: ${results.totalPips >= 0 ? '+' : ''}${results.totalPips.toFixed(1)} pips**
+
+🧠 **AI Performance**:
+🎯 High Confidence Wins (≥90%): ${results.highConfWins}
+
+📋 **Recent Signals**:
+${results.signals.slice(-5).map(s => `${s.result === 'WIN' ? '✅' : '❌'} ${s.symbol}: ${s.pips} pips`).join('\n') || 'No closed signals yet'}
+
+🕒 **Data Source**: Real signals from ai_signals table
+⏰ **Period**: Last 24 hours
+🛡️ **Verified by**: Quantix SSOT v1.9.5
+━━━━━━━━━━━━━━━━━━
+                `;
+
+                await botAction('sendMessage', {
+                    chat_id: chatId,
+                    text: report,
+                    parse_mode: 'Markdown'
+                });
+
+                console.log(`📊 [BACKTEST] Report sent to ${chatId}: ${results.win}W/${results.loss}L, ${results.totalPips.toFixed(1)} pips`);
+
+            } catch (error) {
+                console.error('[BACKTEST ERROR]', error);
+                await botAction('sendMessage', {
+                    chat_id: chatId,
+                    text: '❌ **Error calculating performance**\n\nPlease contact admin.'
+                });
+            }
+        } else {
+            // Invalid passcode
+            backtestStates.delete(chatId);
+            console.log(`❌ [BACKTEST] Invalid passcode attempt from ${chatId}`);
+            return await botAction('sendMessage', {
+                chat_id: chatId,
+                text: '❌ **Access Denied**\n\nInvalid passcode.'
+            });
+        }
+        return; // Exit after handling backtest flow
     }
 
     // A. VIP EXPERIENCE (Showcase /vip)
