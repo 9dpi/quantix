@@ -342,106 +342,60 @@ export default function AppMVP() {
 
     // FETCH REAL DATA
     useEffect(() => {
-        if (!supabase) {
-            console.error("Supabase client is not initialized.");
-            return;
-        }
+        if (!supabase) return;
 
-        console.log("🔌 Connected to Supabase, fetching EUR/USD signals...");
+        console.log("🔌 Connected to Supabase SSOT Handshake...");
 
-        const fetchSignals = async () => {
-            const { data, error } = await supabase
-                .from('ai_signals')
-                .select('*')
-                .eq('symbol', 'EURUSD=X')
-                .order('created_at', { ascending: false })
-                .limit(20);
+        const fetchSSOTData = async () => {
+            try {
+                // 1. Fetch Live Price from market_snapshot (SSOT)
+                const { data: snapshot, error: snapError } = await supabase
+                    .from('market_snapshot')
+                    .select('*')
+                    .eq('symbol', 'EURUSD=X')
+                    .single();
 
-            if (data && !error && data.length > 0) {
-                const latestSignal = data[0];
-                if (latestSignal.current_price) setCurrentPrice(latestSignal.current_price);
-                if (latestSignal.last_checked_at) setLastUpdate(latestSignal.last_checked_at);
+                if (snapshot && !snapError) {
+                    setCurrentPrice(snapshot.price);
+                    setLastUpdate(snapshot.last_updated);
+                }
 
-                const realSignals = data.map(d => ({
-                    id: d.id,
-                    pair: 'EUR/USD',
-                    action: d.signal_type === 'LONG' ? 'BUY' : 'SELL',
-                    entry: parseFloat(d.predicted_close || 0).toFixed(5),
-                    sl: d.sl_price ? parseFloat(d.sl_price).toFixed(5) : (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(5),
-                    tp1_raw: d.tp1_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)),
-                    tp2_raw: d.tp2_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)),
-                    conf: d.confidence_score,
-                    status: d.signal_status || 'WAITING',
-                    timestamp: d.created_at,
-                    time: new Date(d.created_at).toLocaleTimeString()
-                }));
-                setSignals(realSignals);
-            }
+                // 2. Fetch Signals from ai_signals
+                const { data: signalsData, error: sigError } = await supabase
+                    .from('ai_signals')
+                    .select('*')
+                    .eq('symbol', 'EURUSD=X')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
 
-            setTimeout(() => {
+                if (signalsData && !sigError) {
+                    const realSignals = signalsData.map(d => ({
+                        id: d.id,
+                        pair: 'EUR/USD',
+                        action: d.signal_type === 'LONG' ? 'BUY' : 'SELL',
+                        entry: parseFloat(d.predicted_close || 0).toFixed(5),
+                        sl: d.sl_price ? parseFloat(d.sl_price).toFixed(5) : (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(5),
+                        tp1_raw: d.tp1_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)),
+                        tp2_raw: d.tp2_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)),
+                        conf: d.confidence_score,
+                        status: d.signal_status || 'WAITING',
+                        timestamp: d.created_at,
+                        time: new Date(d.created_at).toLocaleTimeString()
+                    }));
+                    setSignals(realSignals);
+                }
+
                 setLoadingState('CONNECTED');
                 setTimeout(() => setLoadingState('READY'), 800);
-            }, 1000);
+            } catch (err) {
+                console.error("SSOT Fetch Error:", err);
+            }
         };
 
-        fetchSignals();
+        fetchSSOTData();
+        const dataTimer = setInterval(fetchSSOTData, 10000); // 10s update for MVP
 
-        const dataTimer = setInterval(fetchSignals, 5000);
-
-        const channel = supabase
-            .channel('eurusd-signals-realtime')
-            .on('postgres_changes', {
-                event: '*',
-                schema: 'public',
-                table: 'ai_signals',
-                filter: 'symbol=eq.EURUSD=X'
-            }, (payload) => {
-                console.log('⚡ Signal Pulse Received:', payload.eventType);
-
-                if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-                    const d = payload.new;
-                    if (d.current_price) setCurrentPrice(parseFloat(d.current_price));
-                    if (d.last_checked_at) setLastUpdate(d.last_checked_at);
-
-                    // Update signals list if the signal is already there, or add if new
-                    setSignals(prev => {
-                        const exists = prev.find(s => s.id === d.id);
-                        if (exists) {
-                            return prev.map(s => s.id === d.id ? {
-                                ...s,
-                                status: d.signal_status || s.status,
-                                entry: parseFloat(d.predicted_close || 0).toFixed(5),
-                                sl: d.sl_price ? parseFloat(d.sl_price).toFixed(5) : s.sl,
-                                tp1_raw: d.tp1_price || s.tp1_raw,
-                                tp2_raw: d.tp2_price || s.tp2_raw,
-                                conf: d.confidence_score || s.conf,
-                                // Important: We don't display current_price in the card currently, but we update status
-                            } : s);
-                        } else if (payload.eventType === 'INSERT') {
-                            const newSignal = {
-                                id: d.id,
-                                pair: 'EUR/USD',
-                                action: d.signal_type === 'LONG' ? 'BUY' : 'SELL',
-                                entry: parseFloat(d.predicted_close || 0).toFixed(5),
-                                sl: d.sl_price ? parseFloat(d.sl_price).toFixed(5) : (d.predicted_close * (d.signal_type === 'LONG' ? 0.997 : 1.003)).toFixed(5),
-                                tp1_raw: d.tp1_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.004 : 0.996)),
-                                tp2_raw: d.tp2_price || (d.predicted_close * (d.signal_type === 'LONG' ? 1.008 : 0.992)),
-                                conf: d.confidence_score,
-                                status: d.signal_status || 'WAITING',
-                                timestamp: d.created_at,
-                                time: 'Now'
-                            };
-                            return [newSignal, ...prev];
-                        }
-                        return prev;
-                    });
-                }
-            }).subscribe();
-
-        return () => {
-            clearInterval(dataTimer);
-            supabase.removeChannel(channel);
-        };
+        return () => clearInterval(dataTimer);
     }, []);
 
     return (
