@@ -55,17 +55,21 @@ class CriticAgent {
                 });
             }
 
-            // 3. Calculate composite confidence score
+            // 3. Calculate composite confidence score (v2.5.1 Dynamic Weighting)
             const techScore = techVote.technicalScore || 0;
             const sentimentScore = sentinelVote.sentimentScore || 0;
 
             // Normalize sentiment score from -50/+50 to 0-100 scale
             const normalizedSentiment = ((sentimentScore + 50) / 100) * 100;
 
-            // Weighted composite: 60% technical, 40% sentiment
-            const compositeConfidence = Math.round(
-                (techScore * 0.6) + (normalizedSentiment * 0.4)
-            );
+            let compositeConfidence;
+            if (techScore >= 95) {
+                // Pillar 3: Elite Tech dominates (80/20)
+                compositeConfidence = Math.round((techScore * 0.8) + (normalizedSentiment * 0.2));
+            } else {
+                // Standard weighting (60/40)
+                compositeConfidence = Math.round((techScore * 0.6) + (normalizedSentiment * 0.4));
+            }
 
             // 4. Final threshold check
             if (compositeConfidence < this.consensusRules.minCompositeConfidence) {

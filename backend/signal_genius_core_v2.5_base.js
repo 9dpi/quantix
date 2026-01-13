@@ -32,39 +32,98 @@ export async function analyzeSignalWithAgents(marketData) {
     try {
         const rawDecision = await orchestrator.analyzeAndDecide(marketData);
 
-        // --- SNIPER FILTER V2.5 (THE TRANSPLANT) ---
-        const sniperResult = sniperTechnicalValidator(marketData, rawDecision);
+        // --- TUNING v2.5.1: BRAIN ENHANCEMENT PROTOCOL ---
+        let tunedTechScore = rawDecision.votes?.technical?.score || 0;
+        let sentimentScore = rawDecision.votes?.sentinel?.score || 0;
+
+        // Helper: RSI and EMA calculation for tuning
+        const rsi = calculateRSI(marketData.prices);
+        const ema20 = calculateEMA(marketData.prices, 20);
+        const currentPrice = marketData.currentPrice;
+
+        // Pillar 1: Tech Score Decapping (Target 100/100)
+        // If technical alignment is perfect, push to 100
+        const isBullishPerfect = currentPrice > ema20 && rsi > 45 && rsi < 65;
+        const isBearishPerfect = currentPrice < ema20 && rsi > 35 && rsi < 55;
+
+        if (tunedTechScore >= 80 && (isBullishPerfect || isBearishPerfect)) {
+            tunedTechScore = 100; // DECAP SUCCESS
+        }
+
+        // Pillar 3: Dynamic Weighting in Critic Agent (v2.5.2 Elite Calibration)
+        let compositeConfidence = rawDecision.confidence;
+        const normalizedSentiment = ((sentimentScore + 50) / 100) * 100;
+
+        if (tunedTechScore >= 95) {
+            // Pillar 3: Elite Tech dominates (90/10 weighting)
+            compositeConfidence = Math.round((tunedTechScore * 0.9) + (normalizedSentiment * 0.1));
+        } else {
+            // Standard weighting (60/40)
+            compositeConfidence = Math.round((tunedTechScore * 0.6) + (normalizedSentiment * 0.4));
+        }
+
+        // Pillar 2: Sniper Bonus (+6% Volume Momentum)
+        const volumes = marketData.volume || [];
+        const currentVolume = volumes[volumes.length - 1] || 0;
+        const avgVolume = volumes.slice(-10).reduce((a, b) => a + b, 0) / 10 || 1;
+        const volumeRatio = currentVolume / avgVolume;
+
+        let sniperBonus = 0;
+        if (compositeConfidence >= 90 && volumeRatio >= 1.10) { // Lowered from 1.25
+            sniperBonus = 6;
+            compositeConfidence = Math.min(99, compositeConfidence + sniperBonus);
+        }
+
+        // --- FINAL SNIPER VALIDATOR (v2.5) ---
+        // Final action resolution: If Tech is 100, we follow Tech even if Critic was hesitant
+        const techAction = rawDecision.votes?.technical?.decision === 'APPROVE' ? (marketData.direction || 'BUY') : 'NEUTRAL';
+        const baseAction = rawDecision.action || techAction;
+
+        // Inject tuned confidence and resolved action back for the validator
+        const mockDecision = {
+            ...rawDecision,
+            confidence: compositeConfidence,
+            action: (tunedTechScore === 100) ? (marketData.direction === 'LONG' ? 'BUY' : 'SELL') : baseAction
+        };
+
+        const sniperResult = sniperTechnicalValidator(marketData, mockDecision);
 
         return {
-            provider: "Quantix AI Core v2.5",
+            provider: "Quantix AI Core v2.5.3-ELITE",
             client_id: "SignalGenius_AI",
-            version: "2.5.0-SNIPER",
+            version: "2.5.3-SNIPER-ELITE",
 
             // Sniper-Filtered Decision
             shouldEmitSignal: sniperResult.isSniperSafe,
             isGhostSignal: rawDecision.isGhostSignal && !sniperResult.isSniperSafe,
-            confidence: rawDecision.confidence,
-            action: sniperResult.finalAction, // BUY, SELL, or NEUTRAL
+            confidence: compositeConfidence,
+            action: sniperResult.finalAction,
 
-            // Multi-Agent details (Legacy Support)
-            votes: rawDecision.votes,
+            // Performance Metadata
+            tuning: {
+                decapped: tunedTechScore === 100,
+                dynamicWeightApplied: tunedTechScore >= 95,
+                sniperBonusApplied: sniperBonus > 0,
+                volumeRatio: volumeRatio.toFixed(2),
+                elite_overdrive: tunedTechScore === 100 && !rawDecision.shouldEmitSignal
+            },
+
             reasoning: sniperResult.isSniperSafe ?
-                `🎯 SNIPER APPROVED: ${rawDecision.reasoning}` :
-                `🛡️ SNIPER REJECTED: ${sniperResult.rejectReason}`,
+                `🎯 SNIPER ELITE: ${rawDecision.reasoning || 'Perfect Technical Convergence'} [Bonus: +${sniperBonus}%]` :
+                `🛡️ SNIPER REJECTED: ${sniperResult.rejectReason} (Conf: ${compositeConfidence}%)`,
 
-            // Metadata for Monitoring
             metadata: {
-                ema20: sniperResult.indicators.ema20.toFixed(5),
-                rsi: sniperResult.indicators.rsi.toFixed(2),
-                confidence_check: rawDecision.confidence > 95 ? 'PASS' : 'FAIL',
+                ema20: ema20.toFixed(5),
+                rsi: rsi.toFixed(2),
+                confidence_check: compositeConfidence > 95 ? 'PASS' : 'FAIL',
                 disclaimer: "Powered by Quantix AI Core"
             }
         };
 
     } catch (error) {
-        console.error('[Quantix Core v2.5] Sniper analysis failed:', error);
+        console.error('[Quantix Core v2.5.1] Tuning failure:', error);
         return {
-            provider: "Quantix AI Core v2.5",
+            provider: "Quantix AI Core v2.5.1",
             shouldEmitSignal: false,
             action: "NEUTRAL",
             confidence: 0,

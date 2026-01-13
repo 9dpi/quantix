@@ -50,15 +50,29 @@ class TechnicalAgent {
             // 3. RSI Overbought/Oversold Check
             const rsiScore = this._scoreRSI(rsi, marketData.direction);
 
-            // 4. EMA Alignment Check
-            const emaScore = emaSignal.aligned ? 80 : 40;
+            // 4. EMA Alignment Check (v2.5.1 Enhanced)
+            const prices = marketData.prices || [];
+            const ema20 = this._calculateEMA(prices, 20);
+            const currentPrice = marketData.currentPrice;
 
-            // 5. Calculate composite technical score
-            const technicalScore = Math.round(
+            // Check trend alignment
+            const isTrendBullish = currentPrice > ema20;
+            const isTrendBearish = currentPrice < ema20;
+            const isEMAMatch = (marketData.direction === 'LONG' && isTrendBullish) || (marketData.direction === 'SHORT' && isTrendBearish);
+
+            const emaScore = isEMAMatch ? 90 : 30;
+
+            // 5. Calculate composite technical score (v2.5.1 Decapped)
+            let technicalScore = Math.round(
                 (rsiScore * 0.4) +
                 (emaScore * 0.3) +
                 (volumeScore * 0.3)
             );
+
+            // THE CONVERGENCE: If RSI, EMA, and Volume are elite -> 100%
+            if (rsiScore >= 85 && emaScore >= 90 && volumeScore >= 90) {
+                technicalScore = 100;
+            }
 
             // 6. Decision threshold
             const decision = technicalScore >= 60 ? 'APPROVE' : 'REJECT';
@@ -121,21 +135,21 @@ class TechnicalAgent {
      * Score RSI based on signal direction
      */
     _scoreRSI(rsi, direction) {
-        // More lenient scoring for testing and real-world scenarios
+        // v2.5.1 Elite Scoring Ranges
         if (direction === 'LONG') {
-            // For LONG: prefer RSI 30-70 (avoid extreme overbought)
-            if (rsi >= 30 && rsi <= 70) return 85;
-            if (rsi > 70 && rsi <= 80) return 65;
-            if (rsi > 80) return 40; // Very overbought - risky
-            if (rsi < 30) return 75; // Oversold - good for LONG
-            return 60;
+            // Perfect LONG: RSI 40-60 (Rising momentum)
+            if (rsi >= 40 && rsi <= 60) return 95;
+            if (rsi >= 30 && rsi < 40) return 85;
+            if (rsi > 60 && rsi <= 70) return 75;
+            if (rsi > 70) return 30; // Overbought
+            return 50;
         } else {
-            // For SHORT: prefer RSI 30-70 (avoid extreme oversold)
-            if (rsi >= 30 && rsi <= 70) return 85;
-            if (rsi >= 20 && rsi < 30) return 65;
-            if (rsi < 20) return 40; // Very oversold - risky for SHORT
-            if (rsi > 70) return 75; // Overbought - good for SHORT
-            return 60;
+            // Perfect SHORT: RSI 40-60 (Falling momentum)
+            if (rsi >= 40 && rsi <= 60) return 95;
+            if (rsi > 60 && rsi <= 70) return 85;
+            if (rsi >= 30 && rsi < 40) return 75;
+            if (rsi < 30) return 30; // Oversold
+            return 50;
         }
     }
 
