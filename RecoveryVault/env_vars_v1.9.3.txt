@@ -1,0 +1,63 @@
+# =====================================================
+# QUANTIX AI v1.9.3 - ENVIRONMENT VARIABLES BACKUP
+# Created: 2026-01-13T12:02:00+07:00
+# Purpose: Snapshot of all Railway environment variables before SSOT migration
+# =====================================================
+
+# === DATABASE CONFIGURATION ===
+DB_HOST=[Your Supabase Host]
+DB_USER=[Your DB User]
+DB_PASSWORD=[Your DB Password]
+DB_NAME=[Your DB Name]
+DB_PORT=5432
+
+# === SUPABASE CONFIGURATION ===
+SUPABASE_URL=[Your Supabase URL]
+SUPABASE_KEY=[Your Supabase Anon Key]
+SUPABASE_SERVICE_KEY=[Your Supabase Service Key]
+
+# === TELEGRAM BOT CONFIGURATION ===
+TELEGRAM_BOT_TOKEN=8510625910:AAFZCWKstyTvLdIyOSwKcmwmSB82Zf9btiU
+TELEGRAM_TOKEN=8510625910:AAFZCWKstyTvLdIyOSwKcmwmSB82Zf9btiU
+TELEGRAM_CHAT_ID=7985984228
+
+# === TELEGRAM GROUP IDS ===
+GROUP_ID_VIP=[Your VIP Group ID]
+GROUP_ID_OFFICIAL=[Your Official Group ID]
+GROUP_ID_COMMUNITY=[Your Community Group ID]
+
+# === AI CONFIGURATION ===
+MIN_CONFIDENCE_THRESHOLD=85
+PATTERN_CACHE_MODE=LOCAL
+
+# === SYSTEM CONFIGURATION ===
+NODE_ENV=production
+PORT=3000
+
+# =====================================================
+# MONITORED ASSETS (for Scanner)
+# =====================================================
+# Primary Assets:
+# - EURUSD=X (Forex)
+# - BTC-USD (Crypto)
+# - AAPL (US Stock)
+# - VN30F1M (Vietnam Futures)
+
+# =====================================================
+# NOTES FOR SSOT MIGRATION
+# =====================================================
+# After SSOT implementation:
+# 1. Scanner will write to market_snapshot table
+# 2. Bot will READ from market_snapshot (no more Yahoo Finance calls)
+# 3. All services share same data source (Database)
+# 4. Reduces API calls by 80%
+# 5. Improves response time to <50ms
+
+# =====================================================
+# ROLLBACK INSTRUCTIONS
+# =====================================================
+# If SSOT causes issues:
+# 1. git checkout v1.9.3-pre-ssot
+# 2. Restore these environment variables on Railway
+# 3. Redeploy all services
+# 4. Expected recovery time: <5 minutes
