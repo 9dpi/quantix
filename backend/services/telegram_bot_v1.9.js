@@ -11,6 +11,10 @@ const yahooFinance = new YahooFinance();
 
 // --- CONFIGURATION ---
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN;
+if (!TOKEN) {
+    console.error("❌ [CRITICAL] No TELEGRAM_BOT_TOKEN found in environment variables!");
+    process.exit(1);
+}
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
 
 // Group IDs from Railway Variables
@@ -70,9 +74,13 @@ async function botAction(method, body) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
-        return await res.json();
+        const data = await res.json();
+        if (!data.ok) {
+            console.error(`[BOT API Error] ${method} failed:`, data.description);
+        }
+        return data;
     } catch (e) {
-        console.error(`[BOT] Error:`, e.message);
+        console.error(`[BOT Network Error] ${method} failed:`, e.message);
     }
 }
 
@@ -118,6 +126,9 @@ async function handleMessage(msg) {
     const text = msg.text;
     const chatId = msg.chat.id.toString();
     const isPrivate = msg.chat.type === 'private';
+
+    console.log(`📩 [INCOMING] Message from ${chatId} (${isPrivate ? 'Private' : 'Group'}): "${text || '[No Text]'}"`);
+
     if (!text) return;
 
     // 0. GLOBAL COMMAND: /start

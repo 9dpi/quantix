@@ -73,10 +73,10 @@ async function fetchInstitutionalData(symbol) {
             ? (prices[prices.length - 1] - prices[prices.length - 10]) / prices[prices.length - 10]
             : 0;
 
-        const avgVolume = volumes.reduce((a, b) => a + b, 0) / volumes.length;
+        const avgVolume = (volumes.reduce((a, b) => a + b, 0) / volumes.length) || 1;
         const volumeRatio = lastCandle.volume / avgVolume;
 
-        console.log(`📊 [${symbol}] Quality: ${validHistory.length} candles | Momentum: ${(momentum * 100).toFixed(2)}% | Vol: ${volumeRatio.toFixed(2)}x`);
+        console.log(`📊 [${symbol}] Quality: ${validHistory.length} candles | Momentum: ${(momentum * 100).toFixed(2)}% | Vol: ${(volumeRatio || 0).toFixed(2)}x`);
 
         return {
             symbol,
@@ -170,7 +170,7 @@ async function scanAll() {
 }
 
 async function runScanner() {
-    console.log("🚀 Institutional AI Scanner v1.8 - ACTIVE");
+    console.log("🚀 Institutional AI Scanner v1.9 - ACTIVE");
     console.log(`📡 Monitoring: ${ASSETS.join(', ')}`);
     console.log(`⏱️  Interval: ${SCAN_INTERVAL / 1000}s`);
 
