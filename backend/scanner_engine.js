@@ -42,7 +42,7 @@ async function fetchFromAlphaVantage(symbol) {
         // Map symbol to AV format
         let avSymbol = symbol.replace('=X', '');
         let functionName = 'FX_INTRADAY';
-        let interval = '60min';
+        let interval = '1min'; // 🔥 CRITICAL: 1min for real-time movement during demo
 
         let url = '';
         if (symbol.includes('BTC')) {
@@ -50,7 +50,6 @@ async function fetchFromAlphaVantage(symbol) {
             avSymbol = 'BTC';
             url = `https://www.alphavantage.co/query?function=${functionName}&symbol=${avSymbol}&market=USD&apikey=${apiKey}`;
         } else {
-            // For Forex: From_Symbol & To_Symbol
             const base = avSymbol.substring(0, 3);
             const quote = avSymbol.substring(3, 6);
             url = `https://www.alphavantage.co/query?function=${functionName}&from_symbol=${base}&to_symbol=${quote}&interval=${interval}&apikey=${apiKey}`;
