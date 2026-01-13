@@ -34,7 +34,7 @@ const SignalBentoCard = memo(({ signal }) => {
             <div className="card-header">
                 <div className="asset-info">
                     <span className="pair">{signal.pair}</span>
-                    <span className="timeframe">M15 • QUANTIX ELITE v2.5.3</span>
+                    <span className="timeframe">M15 • SIGNAL GENIUS ELITE v2.5.3</span>
                 </div>
             </div>
 
@@ -247,7 +247,7 @@ const SignalList = memo(({ signals, loadingState, totalSignalsCount }) => {
                     </div>
                     <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>SYNCHRONIZING CORE...</div>
                     <p className="empty-state-msg">
-                        Quantix Elite AI is establishing a secure tunnel to 10-year data clusters.<br />
+                        Signal Genius AI is establishing a secure tunnel to 10-year data clusters.<br />
                         Integrity verification in progress.
                     </p>
                 </div>
@@ -257,8 +257,8 @@ const SignalList = memo(({ signals, loadingState, totalSignalsCount }) => {
                     <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>WAITING FOR ALIGNMENT...</div>
                     <p className="empty-state-msg">
                         {totalSignalsCount > 0
-                            ? "Quantix Elite AI is filtering for the best entries. Currently, no signals meet the strict validation threshold. Stay tuned!"
-                            : "Quantix Elite AI is scanning 6,758+ data points across EUR/USD pairs. Market volatility is currently low. Precision is our priority."}
+                            ? "Signal Genius AI is filtering for the best entries. Currently, no signals meet the strict validation threshold. Stay tuned!"
+                            : "Signal Genius AI is scanning 6,758+ data points across EUR/USD pairs. Market volatility is currently low. Precision is our priority."}
                     </p>
                 </div>
             ) : (
@@ -286,8 +286,8 @@ export default function AppMVP() {
     const [isSmartMode, setIsSmartMode] = useState(true);
 
     useEffect(() => {
-        document.title = "Quantix Elite AI Forecast";
-        const savedTheme = localStorage.getItem('quantix_theme') || 'dark';
+        document.title = "Signal Genius AI Forecast";
+        const savedTheme = localStorage.getItem('Signal Genius_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         setTheme(savedTheme);
 
@@ -358,9 +358,6 @@ export default function AppMVP() {
                 if (snapshot && !snapError) {
                     setCurrentPrice(snapshot.price);
                     setLastUpdate(snapshot.last_updated);
-                    // Update trend based on snapshot or sentiment column if exists
-                    const sentiment = snapshot.sentiment || 'BULLISH';
-                    setData(prev => ({ ...prev, price: snapshot.price, trend1H: sentiment }));
                 }
 
                 // 2. Fetch Signals from ai_signals
@@ -422,7 +419,7 @@ export default function AppMVP() {
             <nav className="glass-panel" style={{ padding: '0.75rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, borderRadius: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => window.location.href = '#/'}>
                     <Zap color="var(--primary)" size={20} />
-                    <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Quantix Elite <span style={{ fontSize: '0.7rem', border: '1px solid var(--primary)', padding: '1px 4px', borderRadius: '4px', color: 'var(--primary)' }}>AI</span></span>
+                    <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Signal Genius <span style={{ fontSize: '0.7rem', border: '1px solid var(--primary)', padding: '1px 4px', borderRadius: '4px', color: 'var(--primary)' }}>AI</span></span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <button onClick={toggleTheme} style={{ background: 'transparent', border: '1px solid var(--border-color)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -464,10 +461,10 @@ export default function AppMVP() {
                         Educational purposes only. Past performance does not guarantee future results.
                     </p>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '0.5rem', fontWeight: '500' }}>
-                        Powered by <span style={{ color: 'var(--neon-blue)' }}>Quantix Elite Core v2.5.3</span>
+                        Powered by <span style={{ color: 'var(--neon-blue)' }}>Signal Genius Elite Core v2.5.3</span>
                     </p>
                     <p style={{ color: 'var(--text-secondary)', opacity: 0.6, fontSize: '0.65rem', marginTop: '0.4rem' }}>
-                        &copy; 2026 Quantix AI. Forensic Market Analysis System.
+                        &copy; 2026 Signal Genius AI. Forensic Market Analysis System.
                     </p>
                 </footer>
             </main>

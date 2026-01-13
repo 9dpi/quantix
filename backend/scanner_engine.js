@@ -117,28 +117,29 @@ async function fetchFromYahoo(symbol) {
 
 /**
  * PRODUCTION_STRICT: Real data ONLY - System halts if unavailable
+ * PRIMARY: Yahoo Finance (Unlimited, Free)
+ * FALLBACK: Alpha Vantage (Limited quota)
  */
 async function fetchInstitutionalData(symbol) {
     console.log(`📡 [${symbol}] PRODUCTION_STRICT Mode: Fetching REAL data...`);
 
     try {
-        // PRIMARY: Alpha Vantage
-        const data = await fetchFromAlphaVantage(symbol);
+        // PRIMARY: Yahoo Finance (No quota limits)
+        const data = await fetchFromYahoo(symbol);
         return data;
     } catch (primaryError) {
-        console.error(`❌ PRIMARY SOURCE FAILED:`, primaryError.message);
+        console.error(`❌ PRIMARY SOURCE (Yahoo) FAILED:`, primaryError.message);
 
-        if (DATA_MODE === 'PRODUCTION_STRICT') {
-            // STRICT MODE: No fallback, system must halt
-            throw new Error(`CORE_DATA_UNAVAILABLE: ${primaryError.message}`);
-        }
-
-        // FALLBACK MODE: Try Yahoo
-        console.warn(`⚠️ Attempting Yahoo fallback...`);
+        // FALLBACK: Try Alpha Vantage
+        console.warn(`⚠️ Attempting Alpha Vantage fallback...`);
         try {
-            const data = await fetchFromYahoo(symbol);
+            const data = await fetchFromAlphaVantage(symbol);
             return data;
         } catch (fallbackError) {
+            if (DATA_MODE === 'PRODUCTION_STRICT') {
+                // STRICT MODE: Both sources failed, system must halt
+                throw new Error(`CORE_DATA_UNAVAILABLE: Yahoo=${primaryError.message}, AlphaVantage=${fallbackError.message}`);
+            }
             throw new Error(`ALL_SOURCES_FAILED: Primary=${primaryError.message}, Fallback=${fallbackError.message}`);
         }
     }
@@ -247,19 +248,31 @@ async function scanAll() {
                 await updateSSOT(symbol, marketData, decision);
 
                 if (decision.shouldEmitSignal || decision.isGhostSignal) {
+                    // Format pair name for display (EURUSD=X -> EURUSD)
+                    const displayPair = symbol.replace('=X', '');
+
                     const signalBody = {
                         symbol,
+                        pair: displayPair, // For Telegram display
                         action: decision.action,
+                        entry: marketData.currentPrice.toFixed(5), // String format for Telegram
                         entry_price: marketData.currentPrice,
-                        tp: decision.tp,
-                        sl: decision.sl,
+                        tp: decision.tp ? decision.tp.toFixed(5) : (marketData.currentPrice * (decision.action === 'BUY' ? 1.004 : 0.996)).toFixed(5),
+                        sl: decision.sl ? decision.sl.toFixed(5) : (marketData.currentPrice * (decision.action === 'BUY' ? 0.997 : 1.003)).toFixed(5),
                         confidence: decision.confidence,
                         ai_status: decision.action,
+                        agentDecision: {
+                            confidence: decision.confidence,
+                            action: decision.action,
+                            agentConsensus: decision.agents,
+                            reasoning: decision.reasoning || 'Multi-agent consensus achieved'
+                        },
                         metadata: {
                             agents: decision.agents,
                             market_state: decision.market_state,
                             source: marketData.metadata.source,
-                            isolation: 'STRICT_ACTIVE'
+                            isolation: 'STRICT_ACTIVE',
+                            timestamp: new Date().toISOString()
                         }
                     };
 
