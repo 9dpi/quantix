@@ -3,10 +3,17 @@ const yahooFinance = new YahooFinance();
 
 import dotenv from 'dotenv';
 import pg from 'pg';
+import { createClient } from '@supabase/supabase-js';
 import { analyzeSignalWithAgents } from './signal_genius_core_v1.8.js';
 import { broadcastGoldenSignal } from './telegram_autopilot.js';
 
 dotenv.config();
+
+// Initialize Supabase for SSOT
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_KEY
+);
 
 // --- CONFIGURATION ---
 const ASSETS = ['EURUSD=X', 'BTC-USD', 'AAPL', 'VN30F1M'];
@@ -103,6 +110,52 @@ async function fetchInstitutionalData(symbol) {
     }
 }
 
+/**
+ * SSOT WORKER: Update market_snapshot table with latest data
+ * This is the SINGLE SOURCE OF TRUTH for all services
+ */
+async function updateSSOT(symbol, marketData, agentDecision) {
+    try {
+        // Get last 4 candles for pattern matching
+        const last4Candles = marketData.prices.slice(-4).map((price, idx) => ({
+            o: price,
+            h: price * 1.001,  // Simplified - in production, use actual OHLC
+            l: price * 0.999,
+            c: price,
+            v: marketData.volume[marketData.volume.length - 4 + idx] || 0
+        }));
+
+        const { error } = await supabase
+            .from('market_snapshot')
+            .upsert({
+                symbol: symbol,
+                price: marketData.currentPrice,
+                change_24h: marketData.metadata.momentum * 100,
+                high_24h: Math.max(...marketData.prices.slice(-24)),
+                low_24h: Math.min(...marketData.prices.slice(-24)),
+                volume: marketData.volume[marketData.volume.length - 1] || 0,
+                last_candle_data: last4Candles,
+                ai_status: agentDecision.action || 'NEUTRAL',
+                confidence_score: agentDecision.confidence || 0,
+                data_quality: marketData.metadata.candleCount >= 50 ? 'GOOD' : 'DEGRADED',
+                last_updated: new Date().toISOString()
+            }, {
+                onConflict: 'symbol'
+            });
+
+        if (error) {
+            console.error(`🚨 [SSOT_ERROR] Sync failed for ${symbol}:`, error.message);
+            return false;
+        }
+
+        console.log(`✅ [SSOT_SYNC] ${symbol} updated: $${marketData.currentPrice.toFixed(5)} | ${agentDecision.action || 'NEUTRAL'} (${agentDecision.confidence || 0}%)`);
+        return true;
+    } catch (err) {
+        console.error(`🚨 [SSOT_CRITICAL] ${symbol}:`, err.message);
+        return false;
+    }
+}
+
 async function saveSignalToDB(signal, agentDecision) {
     const client = await pool.connect();
     try {
@@ -139,6 +192,9 @@ async function scanAll() {
         // Perform Multi-Agent Analysis
         const decision = await analyzeSignalWithAgents(marketData);
 
+        // 🔥 SSOT UPDATE: Always update market_snapshot, regardless of signal
+        await updateSSOT(symbol, marketData, decision);
+
         if (decision.shouldEmitSignal || decision.isGhostSignal) {
             console.log(`🎯 SIGNAL IDENTIFIED: ${symbol} (${decision.confidence}%)${decision.isGhostSignal ? ' [GHOST MODE]' : ''}`);
 
@@ -170,9 +226,11 @@ async function scanAll() {
 }
 
 async function runScanner() {
-    console.log("🚀 Institutional AI Scanner v1.9 - ACTIVE");
+    console.log("🚀 Institutional AI Scanner v1.9.4 - SSOT WORKER MODE");
     console.log(`📡 Monitoring: ${ASSETS.join(', ')}`);
     console.log(`⏱️  Interval: ${SCAN_INTERVAL / 1000}s`);
+    console.log(`🔥 SSOT: Writing to market_snapshot table every cycle`);
+    console.log(``);
 
     // Initial scan
     await scanAll();
