@@ -34,21 +34,20 @@ const pool = new Pool({
 
 // --- PATTERN CACHE LOADING ---
 let patternCache = [];
-const CACHE_MODE = process.env.PATTERN_CACHE_MODE || 'LOCAL'; // LOCAL or CLOUD
+const CACHE_MODE = process.env.PATTERN_CACHE_MODE || 'LOCAL';
 
 async function loadPatterns() {
-    if (CACHE_MODE === 'CLOUD') {
-        try {
+    try {
+        if (CACHE_MODE === 'CLOUD') {
             console.log('[V1.9] Loading patterns from Cloud (Supabase)...');
             const result = await pool.query('SELECT vector_hash, results FROM pattern_cache LIMIT 5000');
             patternCache = result.rows;
             console.log(`[V1.9] Loaded ${patternCache.length} patterns from Cloud.`);
-        } catch (err) {
-            console.error('[V1.9] Cloud load failed, falling back to local file.', err.message);
+        } else {
             loadLocalPatterns();
         }
-    } else {
-        loadLocalPatterns();
+    } catch (err) {
+        console.warn('[V1.9] Pattern loading delayed or failed, using empty cache.', err.message);
     }
 }
 
@@ -137,14 +136,7 @@ async function handleMessage(msg) {
 
     // 0. GLOBAL COMMAND: /start
     if (text === '/start') {
-        const welcome = `
-👋 **Welcome to Signal Genius AI v1.9!**
-I am the institutional-grade pattern recognition bot.
-
-Available Commands:
-/vip - Show premium signal analysis
-/status - Show system transparency & PnL
-        `;
+        const welcome = `🚀 **Quantix Bot v1.9.3 - ONLINE**\n\nI have received your message. AI Core is active.\n\nType **/vip** to see my latest analysis!`;
         return await botAction('sendMessage', { chat_id: chatId, text: welcome, parse_mode: 'Markdown' });
     }
 
