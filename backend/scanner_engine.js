@@ -74,62 +74,76 @@ async function fetchFromAlphaVantage(symbol) {
 
 /**
  * Fetch historical data + LIVE quote to ensure analysis is on the 'tip' of the market
+ * v1.9.5 BATTLE-READY: Alpha Vantage Priority + Yahoo Fallback with Timeout
  */
 async function fetchInstitutionalData(symbol) {
+    // 1. PRIMARY ENGINE: Alpha Vantage (Bypasses Yahoo 429/ENETUNREACH)
+    console.log(`📡 [${symbol}] Primary Engine: Attempting Alpha Vantage...`);
+    const fallbackData = await fetchFromAlphaVantage(symbol);
+
+    if (fallbackData) {
+        // Alpha Vantage success - this is our "clean" data for the demo
+        fallbackData.dataQuality = 'GOOD'; // Using AV as primary now
+        fallbackData.metadata = { momentum: 0, volumeRatio: 1.0, candleCount: 0 };
+        return fallbackData;
+    }
+
+    // 2. SECONDARY ENGINE (FALLBACK): Yahoo Finance with strict timeout
+    console.warn(`⚠️ [${symbol}] Alpha Vantage failed. Falling back to Yahoo with 5s timeout...`);
+
     try {
-        const period1 = new Date();
-        period1.setDate(period1.getDate() - 60); // Extended to 60 days
-        const period2 = new Date();
+        const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('Yahoo Timeout')), ms));
 
-        const chartResult = await yahooFinance.chart(symbol, {
-            period1,
-            period2,
-            interval: '1h'
-        });
-        const history = chartResult.quotes;
-        const quote = await yahooFinance.quote(symbol);
-        const livePrice = quote.regularMarketPrice;
+        const fetchYahoo = async () => {
+            const period1 = new Date();
+            period1.setDate(period1.getDate() - 60);
+            const period2 = new Date();
 
-        if (!history || history.length < 10) throw new Error("Yahoo Insufficient Data");
+            const chartResult = await yahooFinance.chart(symbol, {
+                period1,
+                period2,
+                interval: '1h'
+            });
+            const history = chartResult.quotes;
+            const quote = await yahooFinance.quote(symbol);
+            const livePrice = quote.regularMarketPrice;
 
-        const validHistory = history.filter(h => h.open && h.high && h.low && h.close);
+            if (!history || history.length < 10) throw new Error("Yahoo Insufficient Data");
 
-        // Update latest candle with LIVE price
-        if (validHistory.length > 0) {
-            const lastIdx = validHistory.length - 1;
-            validHistory[lastIdx].close = livePrice;
-            validHistory[lastIdx].high = Math.max(validHistory[lastIdx].high, livePrice);
-            validHistory[lastIdx].low = Math.min(validHistory[lastIdx].low, livePrice);
-        }
+            const validHistory = history.filter(h => h.open && h.high && h.low && h.close);
 
-        const prices = validHistory.map(h => h.close);
-        const lastCandle = validHistory[validHistory.length - 1];
-
-        console.log(`📊 [${symbol}] Yahoo Sync Success: $${livePrice}`);
-
-        return {
-            symbol,
-            currentPrice: livePrice,
-            prices,
-            volume: validHistory.map(h => h.volume || 0),
-            currentCandle: {
-                open: lastCandle.open, high: lastCandle.high, low: lastCandle.low, close: lastCandle.close
-            },
-            dataQuality: 'GOOD',
-            metadata: {
-                momentum: ((prices[prices.length - 1] - prices[prices.length - 10]) / prices[prices.length - 10]) || 0,
-                volumeRatio: 1.0, // Placeholder
-                candleCount: validHistory.length
+            if (validHistory.length > 0) {
+                const lastIdx = validHistory.length - 1;
+                validHistory[lastIdx].close = livePrice;
+                validHistory[lastIdx].high = Math.max(validHistory[lastIdx].high, livePrice);
+                validHistory[lastIdx].low = Math.min(validHistory[lastIdx].low, livePrice);
             }
+
+            const prices = validHistory.map(h => h.close);
+            const lastCandle = validHistory[validHistory.length - 1];
+
+            return {
+                symbol,
+                currentPrice: livePrice,
+                prices,
+                volume: validHistory.map(h => h.volume || 0),
+                currentCandle: {
+                    open: lastCandle.open, high: lastCandle.high, low: lastCandle.low, close: lastCandle.close
+                },
+                dataQuality: 'DEGRADED', // Yahoo is now the fallback
+                metadata: {
+                    momentum: ((prices[prices.length - 1] - prices[prices.length - 10]) / prices[prices.length - 10]) || 0,
+                    volumeRatio: 1.0,
+                    candleCount: validHistory.length
+                }
+            };
         };
+
+        // Race between Yahoo fetch and 5s timeout
+        return await Promise.race([fetchYahoo(), timeout(5000)]);
+
     } catch (err) {
-        console.warn(`⚠️ [${symbol}] Yahoo Engine FAILED (429/Timeout). Switching to Alpha Vantage...`);
-        const fallbackData = await fetchFromAlphaVantage(symbol);
-        if (fallbackData) {
-            // Add required metadata to fallback
-            fallbackData.metadata = { momentum: 0, volumeRatio: 1.0, candleCount: 0 };
-            return fallbackData;
-        }
+        console.error(`🚨 [${symbol}] ALL ENGINES FAILED:`, err.message);
         throw err;
     }
 }
